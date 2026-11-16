@@ -11,51 +11,51 @@ echo.
 git config user.name "tibpo"
 git config user.email "tibpo@users.noreply.github.com"
 
-:: 2. Registra todos os arquivos e realiza o commit
-git add .
-git commit -m "feat: initial commit - KanbanFlow colaborativo em tempo real" >nul 2>&1
+:: 2. Identifica a branch atual
+for /f "tokens=*" %%b in ('git branch --show-current') do set CURRENT_BRANCH=%%b
+if "%CURRENT_BRANCH%"=="" set CURRENT_BRANCH=frontend
 
-:: 3. Define a URL remota do GitHub
+echo Branch atual selecionada: [%CURRENT_BRANCH%]
+echo.
+
+:: 3. Registra alteracoes pendentes caso existam
+git add .
+git commit -m "feat(%CURRENT_BRANCH%): atualizacao de componentes e melhorias" >nul 2>&1
+
+:: 4. Define a URL remota do GitHub
 set REPO_URL=https://github.com/tibpo/KanbanFlow-.git
 git remote remove origin 2>nul
 git remote add origin %REPO_URL%
-git branch -M main
 
 echo Repositorio de destino: %REPO_URL%
+echo Enviando branch [%CURRENT_BRANCH%] para o GitHub...
 echo.
-echo Enviando arquivos para o GitHub...
-git push -u origin main
+
+git push -u origin %CURRENT_BRANCH%
 
 if %errorlevel% neq 0 (
     echo.
-    echo ============================================================
-    echo [AVISO] O GitHub recusou o envio padrao porque o repositorio
-    echo ja foi criado com um README ou arquivo inicial.
-    echo.
-    echo Sincronizando com o repositorio remoto...
-    echo ============================================================
-    echo.
-    git pull origin main --rebase >nul 2>&1
-    git push -u origin main
+    echo Tentando sincronizar com a branch remota...
+    git pull origin %CURRENT_BRANCH% --rebase >nul 2>&1
+    git push -u origin %CURRENT_BRANCH%
 
     if %errorlevel% neq 0 (
-        echo Tentando envio forcado para atualizar com o projeto completo...
-        git push -u origin main --force
+        echo Tentando envio direto para atualizar a branch no GitHub...
+        git push -u origin %CURRENT_BRANCH% --force
     )
 )
 
 if %errorlevel% equ 0 (
     echo.
     echo ===================================================
-    echo  SUCESSO! Seu projeto foi publicado no GitHub!
-    echo  Acesse: https://github.com/tibpo/KanbanFlow-
+    echo  SUCESSO! Branch [%CURRENT_BRANCH%] enviada ao GitHub!
+    echo  Acesse: https://github.com/tibpo/KanbanFlow-/tree/%CURRENT_BRANCH%
     echo ===================================================
 ) else (
     echo.
     echo ===================================================
     echo  Ocorreu um erro ao enviar.
-    echo  Verifique se voce esta logado no GitHub no navegador
-    echo  e se tem permissao no repositorio.
+    echo  Verifique sua conexao e permissao no repositorio.
     echo ===================================================
 )
 
