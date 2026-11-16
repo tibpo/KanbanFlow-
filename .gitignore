@@ -1,0 +1,19 @@
+# Dependências
+node_modules/
+package-lock.json
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+logs/
+npm-debug.log*
+
+# Editores
+.vscode/
+.idea/
+*.swp
+*.swo

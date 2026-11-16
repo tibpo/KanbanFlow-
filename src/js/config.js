@@ -1,0 +1,142 @@
+/**
+ * config.js - Configurações, Definições de Colunas e Dados Iniciais de Demonstração (pt-BR)
+ */
+
+export const COLUMNS = [
+  { id: 'todo', title: 'A Fazer' },
+  { id: 'in_progress', title: 'Em Progresso' },
+  { id: 'review', title: 'Em Revisão' },
+  { id: 'done', title: 'Concluído' }
+];
+
+export const STORAGE_KEY = 'kanban_flow_data_pt_v1';
+export const THEME_KEY = 'kanban_flow_theme';
+
+export const INITIAL_DATA = {
+  projects: [
+    {
+      id: 'proj_ecommerce',
+      name: 'Plataforma E-Commerce',
+      description: 'Construção de uma loja moderna headless com checkout ultrarrápido.',
+      color: '#6366f1'
+    },
+    {
+      id: 'proj_mobile',
+      name: 'Aplicativo Mobile v2.0',
+      description: 'Redesenho do app multiplataforma em Flutter com sincronização offline.',
+      color: '#10b981'
+    },
+    {
+      id: 'proj_infra',
+      name: 'DevOps & Infraestrutura',
+      description: 'Containerização com Docker e pipeline automatizado de CI/CD.',
+      color: '#f59e0b'
+    }
+  ],
+  tasks: [
+    {
+      id: 'task_1',
+      projectId: 'proj_ecommerce',
+      columnId: 'todo',
+      title: 'Desenhar fluxo de checkout do Pix e Cartão',
+      description: 'Criar telas responsivas com cálculo automático de frete e validação de cupons.',
+      priority: 'high',
+      dueDate: '2026-11-25',
+      assignee: 'Sara Lima',
+      tags: ['ui', 'pagamentos', 'checkout'],
+      order: 0,
+      createdAt: '2026-11-10T10:00:00Z'
+    },
+    {
+      id: 'task_2',
+      projectId: 'proj_ecommerce',
+      columnId: 'todo',
+      title: 'Configurar cache de sessões com Redis',
+      description: 'Implementar cluster Redis para gerenciar carrinhos ativos e sessões com alta disponibilidade.',
+      priority: 'medium',
+      dueDate: '2026-11-28',
+      assignee: 'Davi Silva',
+      tags: ['backend', 'redis', 'cache'],
+      order: 1,
+      createdAt: '2026-11-11T14:30:00Z'
+    },
+    {
+      id: 'task_3',
+      projectId: 'proj_ecommerce',
+      columnId: 'in_progress',
+      title: 'Implementar busca com filtros avançados',
+      description: 'Construir busca instantânea por preço, departamento, marca e avaliações de clientes.',
+      priority: 'urgent',
+      dueDate: '2026-11-20',
+      assignee: 'Alex Moreira',
+      tags: ['frontend', 'busca', 'api'],
+      order: 0,
+      createdAt: '2026-11-12T09:15:00Z'
+    },
+    {
+      id: 'task_4',
+      projectId: 'proj_ecommerce',
+      columnId: 'review',
+      title: 'Auditoria de segurança nas APIs GraphQL',
+      description: 'Revisar limitadores de profundidade de consultas e validações de tokens JWT.',
+      priority: 'high',
+      dueDate: '2026-11-18',
+      assignee: 'Helena Rocha',
+      tags: ['seguranca', 'graphql', 'api'],
+      order: 0,
+      createdAt: '2026-11-13T11:00:00Z'
+    },
+    {
+      id: 'task_5',
+      projectId: 'proj_ecommerce',
+      columnId: 'done',
+      title: 'Configurar Design System e Tailwind CSS',
+      description: 'Criação dos tokens de cores, tipografia, botões e componentes básicos de formulário.',
+      priority: 'low',
+      dueDate: '2026-11-05',
+      assignee: 'Alex Moreira',
+      tags: ['design', 'css', 'ui'],
+      order: 0,
+      createdAt: '2026-11-01T08:00:00Z'
+    },
+    {
+      id: 'task_6',
+      projectId: 'proj_mobile',
+      columnId: 'todo',
+      title: 'Integração de Notificações Push via Firebase',
+      description: 'Configurar canal de notificações push para avisos de entrega de pedidos em tempo real.',
+      priority: 'high',
+      dueDate: '2026-12-01',
+      assignee: 'Sara Lima',
+      tags: ['mobile', 'firebase', 'notificacoes'],
+      order: 0,
+      createdAt: '2026-11-14T15:00:00Z'
+    },
+    {
+      id: 'task_7',
+      projectId: 'proj_mobile',
+      columnId: 'in_progress',
+      title: 'Desbloqueio biométrico (FaceID e Biometria)',
+      description: 'Implementar autenticação rápida e segura integrada ao Keychain e Keystore do sistema.',
+      priority: 'urgent',
+      dueDate: '2026-11-22',
+      assignee: 'Helena Rocha',
+      tags: ['mobile', 'seguranca'],
+      order: 0,
+      createdAt: '2026-11-15T12:00:00Z'
+    },
+    {
+      id: 'task_8',
+      projectId: 'proj_infra',
+      columnId: 'todo',
+      title: 'Provisionamento de cluster Kubernetes com Terraform',
+      description: 'Estruturar infraestrutura como código (IaC) com autoscaling horizontal e monitoramento.',
+      priority: 'high',
+      dueDate: '2026-11-30',
+      assignee: 'Davi Silva',
+      tags: ['devops', 'terraform', 'aws'],
+      order: 0,
+      createdAt: '2026-11-15T16:00:00Z'
+    }
+  ]
+};

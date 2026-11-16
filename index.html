@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Quadro Kanban de Projetos</title>
+  <link rel="stylesheet" href="src/css/variables.css">
+  <link rel="stylesheet" href="src/css/layout.css">
+  <link rel="stylesheet" href="src/css/kanban.css">
+  <link rel="stylesheet" href="src/css/modal.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+</head>
+<body data-theme="dark">
+  <div class="window-container">
+    <!-- Window Top Header -->
+    <header class="window-header">
+      <div class="header-left">
+        <div class="app-brand">
+          <div class="brand-icon">📋</div>
+          <span class="brand-title">KanbanFlow</span>
+          <span class="version-tag">v1.0</span>
+        </div>
+        <div class="active-project-pill" id="headerActiveProject">
+          <span class="project-dot" id="headerProjectColor"></span>
+          <span class="project-name" id="headerProjectName">Projeto Geral</span>
+        </div>
+        <div class="sync-status-pill connecting" id="syncStatusPill" title="Status da sincronização em tempo real">
+          <span class="sync-dot"></span>
+          <span class="sync-text" id="syncText">Conectando...</span>
+        </div>
+      </div>
+
+      <div class="header-center">
+        <div class="search-box">
+          <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="searchInput" placeholder="Buscar tarefas, tags, descrições..." autocomplete="off">
+          <button class="clear-search-btn" id="clearSearchBtn" title="Limpar busca" hidden>&times;</button>
+        </div>
+
+        <select id="priorityFilter" class="filter-select" title="Filtrar por prioridade">
+          <option value="all">Todas as Prioridades</option>
+          <option value="urgent">🔴 Urgente</option>
+          <option value="high">🟠 Alta</option>
+          <option value="medium">🟡 Média</option>
+          <option value="low">🟢 Baixa</option>
+        </select>
+      </div>
+
+      <div class="header-right">
+        <button id="btnNewTask" class="btn btn-primary" title="Criar nova tarefa (N)">
+          <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="12" y1="5" x2="12" y2="19"></line>
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+          </svg>
+          <span>Nova Tarefa</span>
+        </button>
+
+        <button id="btnThemeToggle" class="btn btn-icon" title="Alternar tema claro/escuro" aria-label="Alternar tema">
+          <span id="themeIcon">🌙</span>
+        </button>
+
+        <div class="header-dropdown">
+          <button id="btnMenuToggle" class="btn btn-icon" title="Mais opções" aria-label="Mais opções">
+            <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="1.5"></circle>
+              <circle cx="12" cy="5" r="1.5"></circle>
+              <circle cx="12" cy="19" r="1.5"></circle>
+            </svg>
+          </button>
+          <div class="dropdown-menu" id="headerDropdownMenu">
+            <button id="btnExportData" class="dropdown-item">
+              <span>📥 Exportar Dados (JSON)</span>
+            </button>
+            <label class="dropdown-item file-label">
+              <span>📤 Importar Dados (JSON)</span>
+              <input type="file" id="fileImportData" accept=".json" hidden>
+            </label>
+            <div class="dropdown-divider"></div>
+            <button id="btnResetData" class="dropdown-item text-danger">
+              <span>🔄 Restaurar Dados Padrão</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Workspace -->
+    <div class="window-body">
+      <!-- Left Sidebar: Projects List -->
+      <aside class="sidebar">
+        <div class="sidebar-header">
+          <div class="sidebar-title-group">
+            <h3>Projetos</h3>
+            <span class="badge" id="projectCount">0</span>
+          </div>
+          <button id="btnNewProject" class="btn btn-xs btn-outline" title="Criar novo projeto">
+            + Novo
+          </button>
+        </div>
+
+        <nav class="projects-list" id="projectsList" aria-label="Lista de projetos">
+          <!-- Populated dynamically by UI.js -->
+        </nav>
+
+        <div class="sidebar-footer">
+          <div class="project-stats-card">
+            <div class="stats-header">
+              <span class="stats-label">Progresso Atual</span>
+              <span class="stats-percentage" id="statsPercentage">0%</span>
+            </div>
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="statsProgressBar" style="width: 0%;"></div>
+            </div>
+            <div class="stats-breakdown">
+              <div class="stat-pill"><strong id="statsTotal">0</strong> tarefas</div>
+              <div class="stat-pill text-success"><strong id="statsDone">0</strong> concluídas</div>
+            </div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Board Content -->
+      <main class="board-container">
+        <!-- Board Info Bar -->
+        <div class="board-topbar">
+          <div class="board-title-group">
+            <h1 id="currentProjectTitle">Carregando Projeto...</h1>
+            <p id="currentProjectDesc" class="board-description"></p>
+          </div>
+          <div class="board-actions">
+            <button id="btnEditCurrentProject" class="btn btn-sm btn-ghost" title="Editar informações do projeto">
+              ✏️ Editar Projeto
+            </button>
+          </div>
+        </div>
+
+        <!-- Kanban Columns Track -->
+        <div class="kanban-track" id="kanbanTrack">
+          <!-- Populated dynamically by UI.js -->
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <!-- Task Modal (Create & Edit) -->
+  <div class="modal-backdrop" id="taskModalBackdrop" hidden>
+    <div class="modal-window" role="dialog" aria-modal="true" aria-labelledby="taskModalTitle">
+      <div class="modal-header">
+        <h2 id="taskModalTitle">Nova Tarefa</h2>
+        <button class="modal-close-btn" id="taskModalClose" aria-label="Fechar modal">&times;</button>
+      </div>
+      <form id="taskForm" class="modal-body">
+        <input type="hidden" id="taskId">
+
+        <div class="form-group">
+          <label for="taskTitle">Título da Tarefa <span class="required">*</span></label>
+          <input type="text" id="taskTitle" required placeholder="ex.: Implementar autenticação de usuários" autofocus>
+        </div>
+
+        <div class="form-group">
+          <label for="taskDescription">Descrição</label>
+          <textarea id="taskDescription" rows="3" placeholder="Adicione detalhes, observações ou critérios de aceitação..."></textarea>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taskColumn">Coluna / Status</label>
+            <select id="taskColumn" required>
+              <option value="todo">A Fazer</option>
+              <option value="in_progress">Em Progresso</option>
+              <option value="review">Em Revisão</option>
+              <option value="done">Concluído</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label for="taskPriority">Prioridade</label>
+            <select id="taskPriority" required>
+              <option value="low">🟢 Baixa</option>
+              <option value="medium" selected>🟡 Média</option>
+              <option value="high">🟠 Alta</option>
+              <option value="urgent">🔴 Urgente</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="taskDueDate">Data de Entrega</label>
+            <input type="date" id="taskDueDate">
+          </div>
+
+          <div class="form-group">
+            <label for="taskAssignee">Responsável</label>
+            <input type="text" id="taskAssignee" placeholder="ex.: Alex M.">
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="taskTags">Tags / Etiquetas</label>
+          <input type="text" id="taskTags" placeholder="ex.: frontend, auth, bug (separadas por vírgula)">
+          <span class="field-hint">Separe múltiplas tags usando vírgulas</span>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost text-danger" id="btnDeleteTask" hidden>
+            Excluir Tarefa
+          </button>
+          <div class="footer-right">
+            <button type="button" class="btn btn-outline" id="btnCancelTask">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btnSaveTask">Salvar Tarefa</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Project Modal (Create & Edit) -->
+  <div class="modal-backdrop" id="projectModalBackdrop" hidden>
+    <div class="modal-window modal-sm" role="dialog" aria-modal="true" aria-labelledby="projectModalTitle">
+      <div class="modal-header">
+        <h2 id="projectModalTitle">Criar Projeto</h2>
+        <button class="modal-close-btn" id="projectModalClose" aria-label="Fechar modal">&times;</button>
+      </div>
+      <form id="projectForm" class="modal-body">
+        <input type="hidden" id="projectId">
+
+        <div class="form-group">
+          <label for="projectName">Nome do Projeto <span class="required">*</span></label>
+          <input type="text" id="projectName" required placeholder="ex.: Redesenho do App Mobile">
+        </div>
+
+        <div class="form-group">
+          <label for="projectDescription">Descrição</label>
+          <textarea id="projectDescription" rows="2" placeholder="Breve resumo do projeto..."></textarea>
+        </div>
+
+        <div class="form-group">
+          <label>Cor de Destaque</label>
+          <div class="color-picker-group" id="colorPickerGroup">
+            <label class="color-swatch-label">
+              <input type="radio" name="projectColor" value="#6366f1" checked>
+              <span class="swatch" style="background-color: #6366f1;"></span>
+            </label>
+            <label class="color-swatch-label">
+              <input type="radio" name="projectColor" value="#3b82f6">
+              <span class="swatch" style="background-color: #3b82f6;"></span>
+            </label>
+            <label class="color-swatch-label">
+              <input type="radio" name="projectColor" value="#06b6d4">
+              <span class="swatch" style="background-color: #06b6d4;"></span>
+            </label>
+            <label class="color-swatch-label">
+              <input type="radio" name="projectColor" value="#10b981">
+              <span class="swatch" style="background-color: #10b981;"></span>
+            </label>
+            <label class="color-swatch-label">
+              <input type="radio" name="projectColor" value="#f59e0b">
+              <span class="swatch" style="background-color: #f59e0b;"></span>
+            </label>
+            <label class="color-swatch-label">
+              <input type="radio" name="projectColor" value="#ef4444">
+              <span class="swatch" style="background-color: #ef4444;"></span>
+            </label>
+            <label class="color-swatch-label">
+              <input type="radio" name="projectColor" value="#ec4899">
+              <span class="swatch" style="background-color: #ec4899;"></span>
+            </label>
+            <label class="color-swatch-label">
+              <input type="radio" name="projectColor" value="#8b5cf6">
+              <span class="swatch" style="background-color: #8b5cf6;"></span>
+            </label>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button type="button" class="btn btn-ghost text-danger" id="btnDeleteProject" hidden>
+            Excluir Projeto
+          </button>
+          <div class="footer-right">
+            <button type="button" class="btn btn-outline" id="btnCancelProject">Cancelar</button>
+            <button type="submit" class="btn btn-primary" id="btnSaveProject">Salvar Projeto</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer" aria-live="polite"></div>
+
+  <!-- Application Scripts (Supports both HTTP modular serving and direct file:// launch) -->
+  <script>
+    if (window.location.protocol === 'file:') {
+      // Execução direta por arquivo local (evita bloqueio de CORS em módulos file://)
+      const script = document.createElement('script');
+      script.src = 'src/js/bundle.js';
+      document.body.appendChild(script);
+    } else {
+      // Importação padrão como módulo ES quando servido via HTTP/HTTPS
+      const script = document.createElement('script');
+      script.type = 'module';
+      script.src = 'src/js/app.js';
+      document.body.appendChild(script);
+    }
+  </script>
+</body>
+</html>
