@@ -7,6 +7,7 @@ import { ui } from './ui.js';
 import { modal } from './modal.js';
 import { storage } from './storage.js';
 import { sync } from './sync.js';
+import { landing } from './landing.js';
 
 function initApp() {
   // 1. Initialize Modals & Toasts
@@ -28,6 +29,9 @@ function initApp() {
 
   // 6. Connect to Real-time Sync Server
   setupRealtimeSync();
+
+  // 7. Initialize Landing Page Showcase with Motion Frame and LEDs
+  landing.init();
 }
 
 if (document.readyState === 'loading') {

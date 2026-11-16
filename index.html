@@ -8,6 +8,7 @@
   <link rel="stylesheet" href="src/css/layout.css">
   <link rel="stylesheet" href="src/css/kanban.css">
   <link rel="stylesheet" href="src/css/modal.css">
+  <link rel="stylesheet" href="src/css/landing.css">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
 </head>
 <body data-theme="dark">
@@ -50,6 +51,11 @@
       </div>
 
       <div class="header-right">
+        <button id="btnOpenLanding" class="btn btn-landing-toggle" title="Acessar Apresentação / Landing Page">
+          <span class="sparkle-icon">✨</span>
+          <span>Apresentação</span>
+        </button>
+
         <button id="btnNewTask" class="btn btn-primary" title="Criar nova tarefa (N)">
           <svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="12" y1="5" x2="12" y2="19"></line>
@@ -286,6 +292,86 @@
           </div>
         </div>
       </form>
+    </div>
+  </div>
+
+  <!-- Landing Page / Apresentação Showcase (Motion Frame & LEDs) -->
+  <div class="landing-overlay" id="landingOverlay" hidden>
+    <header class="landing-header">
+      <div class="landing-brand">
+        <span style="font-size: 1.5rem;">📋</span>
+        <h2>KanbanFlow Suite</h2>
+      </div>
+      <button class="landing-close-btn" id="landingCloseBtn" title="Fechar apresentação">&times;</button>
+    </header>
+
+    <div class="landing-hero">
+      <div class="landing-title-block">
+        <div class="landing-badge">✨ Central de Projetos & Apresentação</div>
+        <h1>Organize suas Ideias com Precisão em Tempo Real</h1>
+        <p>Selecione um projeto através do seletor circular orbital abaixo ou visualize o status dos módulos nos LEDs de telemetria.</p>
+      </div>
+
+      <!-- Painel de LEDs Multicoloridos -->
+      <div class="led-dashboard-strip" title="Clique nos LEDs para testar o brilho">
+        <div class="led-item" title="Servidor & Conexão SSE">
+          <span class="led-lamp led-green"></span>
+          <span class="led-label">Servidor</span>
+        </div>
+        <div class="led-item" title="Sincronização em Nuvem">
+          <span class="led-lamp led-cyan"></span>
+          <span class="led-label">Nuvem</span>
+        </div>
+        <div class="led-item" title="Motor de Movimento">
+          <span class="led-lamp led-purple"></span>
+          <span class="led-label">Motion</span>
+        </div>
+        <div class="led-item" title="Fila de Tarefas Ativas">
+          <span class="led-lamp led-amber"></span>
+          <span class="led-label">Fila</span>
+        </div>
+        <div class="led-item" title="Prioridade Alta & Auditoria">
+          <span class="led-lamp led-red"></span>
+          <span class="led-label">Urgente</span>
+        </div>
+        <div class="led-item" title="Interface Reativa">
+          <span class="led-lamp led-pink"></span>
+          <span class="led-label">Reativo</span>
+        </div>
+      </div>
+
+      <!-- Seletor Circular com Motion Frame -->
+      <div class="circular-stage">
+        <!-- Anéis com animação de movimento -->
+        <div class="motion-frame-outer"></div>
+        <div class="motion-frame-middle"></div>
+        <div class="motion-frame-inner"></div>
+
+        <!-- Círculos orbitais de projetos -->
+        <div class="circular-nodes-container" id="circularNodesContainer"></div>
+
+        <!-- Núcleo Central Ativo -->
+        <div class="circular-core" id="circularCore" title="Clique para entrar neste projeto">
+          <div class="core-icon" id="coreIcon">📁</div>
+          <div class="core-title" id="coreTitle">Projeto</div>
+          <div class="core-meta" id="coreMeta">0 Tarefas</div>
+          <div class="core-indicator">
+            <span>●</span>
+            <span>Entrar no Quadro</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ações da Landing -->
+      <div class="landing-actions">
+        <button class="btn-cta-board" id="btnEnterBoard">
+          <span>Abrir Quadro Kanban</span>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <line x1="5" y1="12" x2="19" y2="12"></line>
+            <polyline points="12 5 19 12 12 19"></polyline>
+          </svg>
+        </button>
+      </div>
     </div>
   </div>
 
