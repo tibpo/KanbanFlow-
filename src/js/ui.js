@@ -64,7 +64,10 @@ export const ui = {
           <span class="project-item-dot" style="background-color: ${escapeHtml(project.color || '#6366f1')}"></span>
           <span class="project-item-title" title="${escapeHtml(project.name)}">${escapeHtml(project.name)}</span>
         </div>
-        <span class="project-item-badge">${taskCount}</span>
+        <div style="display: flex; align-items: center; gap: 6px;">
+          <span class="site-led ${isActive ? 'led-cyan' : 'led-purple'}" style="width: 6px; height: 6px;"></span>
+          <span class="project-item-badge">${taskCount}</span>
+        </div>
       `;
 
       itemEl.addEventListener('click', () => {
@@ -110,12 +113,20 @@ export const ui = {
       colEl.className = 'kanban-column';
       colEl.dataset.columnId = column.id;
 
+      const colLeds = {
+        todo: 'led-blue',
+        in_progress: 'led-cyan',
+        review: 'led-purple',
+        done: 'led-green'
+      };
+      const ledClass = colLeds[column.id] || 'led-cyan';
+
       // Header
       const headerEl = document.createElement('div');
       headerEl.className = 'column-header';
       headerEl.innerHTML = `
         <div class="column-header-left">
-          <span class="column-indicator ${column.id}"></span>
+          <span class="site-led ${ledClass}"></span>
           <span class="column-title">${escapeHtml(column.title)}</span>
           <span class="column-count">${columnTasks.length}</span>
         </div>
@@ -202,7 +213,14 @@ export const ui = {
       medium: 'Média',
       low: 'Baixa'
     };
+    const priorityLeds = {
+      urgent: 'led-red',
+      high: 'led-amber',
+      medium: 'led-amber',
+      low: 'led-green'
+    };
     const priorityText = priorityLabels[task.priority] || task.priority;
+    const priorityLed = priorityLeds[task.priority] || 'led-cyan';
 
     cardEl.innerHTML = `
       <div class="task-card-header">
@@ -215,7 +233,10 @@ export const ui = {
       ${tagsHtml ? `<div class="task-tags">${tagsHtml}</div>` : ''}
       <div class="task-card-footer">
         <div class="task-footer-left">
-          <span class="task-priority-pill ${task.priority}">${escapeHtml(priorityText)}</span>
+          <span class="task-priority-pill ${task.priority}" style="display: inline-flex; align-items: center; gap: 4px;">
+            <span class="site-led ${priorityLed}" style="width: 6px; height: 6px;"></span>
+            ${escapeHtml(priorityText)}
+          </span>
           ${dueDateHtml}
         </div>
         ${assigneeHtml}

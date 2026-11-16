@@ -8,6 +8,7 @@ import { modal } from './modal.js';
 import { storage } from './storage.js';
 import { sync } from './sync.js';
 import { landing } from './landing.js';
+import { cursor } from './cursor.js';
 
 function initApp() {
   // 1. Initialize Modals & Toasts
@@ -32,6 +33,9 @@ function initApp() {
 
   // 7. Initialize Landing Page Showcase with Motion Frame and LEDs
   landing.init();
+
+  // 8. Initialize Cybernetic Custom Cursor
+  cursor.init();
 }
 
 if (document.readyState === 'loading') {
