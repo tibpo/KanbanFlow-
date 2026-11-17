@@ -1,0 +1,1767 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ECOVIS BPO | Manual Interativo de POPs - TI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'Segoe UI', 'sans-serif'],
+          },
+          colors: {
+            cream: '#FAF8F5',
+            crimson: {
+              DEFAULT: '#9F1239',
+              dark: '#881337',
+              light: '#FFF1F2',
+              border: '#FECDD3',
+            },
+            stoneink: '#1C1917',
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #FAF8F5;
+      color: #1C1917;
+      font-family: 'Inter', 'Segoe UI', sans-serif;
+    }
+    kbd {
+      background-color: #F5F5F4;
+      border: 1px solid #A8A29E;
+      border-bottom-width: 2px;
+      border-radius: 5px;
+      padding: 1px 6px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.84em;
+      font-weight: 700;
+      color: #1C1917;
+      white-space: nowrap;
+      display: inline-block;
+    }
+    code.inline-code {
+      background-color: #FFF1F2;
+      border: 1px solid #FECDD3;
+      border-radius: 4px;
+      padding: 1px 5px;
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.88em;
+      color: #9F1239;
+      font-weight: 600;
+    }
+    .fade-in {
+      animation: fadeIn 0.22s ease-out;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(4px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col selection:bg-crimson selection:text-white">
+
+  <!-- ===================================================================== -->
+  <!-- TOPBAR / HEADER INSTITUCIONAL ECOVIS BPO                              -->
+  <!-- ===================================================================== -->
+  <header class="bg-crimson text-white shadow-md sticky top-0 z-30">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+      <!-- Marca e Título -->
+      <div class="flex items-center justify-between">
+        <button onclick="resetHome()" class="text-left group focus:outline-none">
+          <div class="flex items-center gap-2">
+            <span class="text-lg sm:text-xl font-extrabold tracking-wider uppercase">ECOVIS <span class="font-normal text-white/80">BPO</span></span>
+            <span class="text-xs font-bold uppercase tracking-widest bg-white/15 px-2.5 py-0.5 rounded-full text-white">TI</span>
+          </div>
+          <p class="text-xs sm:text-sm text-white/85 font-medium mt-0.5 group-hover:text-white transition">
+            Manual Interativo de Procedimentos Operacionais Padrão
+          </p>
+        </button>
+
+        <!-- Botão rápido mobile para Triagem -->
+        <button onclick="switchMode('triage')" class="md:hidden bg-white text-crimson font-bold text-xs px-3 py-2 rounded-lg shadow-sm active:scale-95 transition">
+          Triagem Guiada
+        </button>
+      </div>
+
+      <!-- Barra de Busca Rápida e Alternador de Modo -->
+      <div class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5">
+        <div class="relative flex-1 sm:w-64 md:w-72">
+          <input
+            id="globalSearch"
+            type="text"
+            placeholder="Buscar dúvida, sintoma ou POP..."
+            oninput="handleSearch(this.value)"
+            class="w-full bg-white/15 text-white placeholder-white/70 text-sm rounded-lg pl-9 pr-8 py-2 border border-white/25 focus:outline-none focus:bg-white focus:text-stoneink focus:placeholder-stone-400 transition"
+          />
+          <svg class="w-4 h-4 text-white/75 absolute left-3 top-2.5 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <button id="clearSearchBtn" onclick="clearSearch()" class="hidden absolute right-2.5 top-2 text-stone-400 hover:text-stone-700 text-sm font-bold">✕</button>
+        </div>
+
+        <div class="flex bg-crimson-dark/80 p-1 rounded-lg border border-white/15">
+          <button id="navTriageBtn" onclick="switchMode('triage')" class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition bg-white text-crimson shadow-sm">
+            Triagem Inteligente
+          </button>
+          <button id="navCatalogBtn" onclick="switchMode('catalog')" class="flex-1 sm:flex-none px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition text-white/85 hover:text-white">
+            Todos os 38 POPs
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- ===================================================================== -->
+  <!-- BANNER DE ABERTURA EDITORIAL (CAPA COMPACTA + REGRA DE OURO)          -->
+  <!-- ===================================================================== -->
+  <section id="heroBanner" class="bg-crimson text-white border-b border-crimson-dark">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-7 sm:py-9">
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-7">
+          <span class="inline-block text-xs font-extrabold uppercase tracking-widest text-white/80 mb-2">
+            Guia Interativo de Autoatendimento • Windows 10 / 11
+          </span>
+          <h1 class="text-2xl sm:text-3xl lg:text-4xl font-extrabold tracking-tight leading-tight">
+            Resolva problemas do seu notebook em poucos passos
+          </h1>
+          <p class="text-white/90 text-sm sm:text-base mt-3 leading-relaxed max-w-2xl">
+            Responda à triagem rápida abaixo para encontrar exatamente qual procedimento seguir ou navegue diretamente pelos 38 POPs organizados pela sua necessidade.
+          </p>
+        </div>
+
+        <!-- A Regra de Ouro -->
+        <div class="lg:col-span-5">
+          <div class="bg-white/10 backdrop-blur-sm border border-white/25 rounded-xl p-4 sm:p-5">
+            <div class="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-rose-200 mb-1.5">
+              <span>★</span> A Regra de Ouro
+            </div>
+            <p class="text-xs sm:text-sm text-white/95 leading-relaxed">
+              Antes de abrir um chamado de TI, consulte o POP indicado para o seu caso. Pequenas ações — como <strong>Reiniciar</strong> pelo menu Iniciar (em vez de apenas Desligar), manter <strong>15% livre no SSD</strong> e bloquear a tela (<kbd>Win</kbd> + <kbd>L</kbd>) — evitam a maioria das falhas.
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===================================================================== -->
+  <!-- ÁREA PRINCIPAL DINÂMICA                                               -->
+  <!-- ===================================================================== -->
+  <main class="flex-1 max-w-6xl w-full mx-auto px-4 sm:px-6 py-6 sm:py-8">
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- MODO 1: TRIAGEM INTELIGENTE (QUESTIONÁRIO GUIADO INTERATIVO)        -->
+    <!-- ------------------------------------------------------------------- -->
+    <section id="triageView" class="fade-in">
+      <div class="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
+        <!-- Cabeçalho do Assistente -->
+        <div class="bg-stone-100/80 border-b border-stone-200 px-5 sm:px-7 py-4 flex flex-wrap items-center justify-between gap-3">
+          <div>
+            <span class="text-xs font-extrabold uppercase tracking-wider text-crimson">Assistente de Diagnóstico TI</span>
+            <h2 class="text-lg sm:text-xl font-extrabold text-stoneink mt-0.5">Triagem Inteligente</h2>
+          </div>
+          <div class="flex items-center gap-2">
+            <span id="triageStepBadge" class="text-xs font-bold bg-crimson-light text-crimson border border-crimson-border px-3 py-1 rounded-full">
+              Etapa 1
+            </span>
+            <button id="triageBackBtn" onclick="goBackTriage()" class="hidden text-xs font-bold text-stone-600 hover:text-stoneink bg-white border border-stone-300 px-3 py-1.5 rounded-lg transition">
+              ← Voltar
+            </button>
+            <button id="triageRestartBtn" onclick="restartTriage()" class="hidden text-xs font-bold text-crimson hover:bg-crimson-light border border-crimson-border px-3 py-1.5 rounded-lg transition">
+              Recomeçar
+            </button>
+          </div>
+        </div>
+
+        <!-- Corpo Dinâmico da Pergunta ou Resultado -->
+        <div id="triageBody" class="p-5 sm:p-8">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+
+      <!-- Atalho discreto para ver catálogo completo -->
+      <div class="mt-6 text-center">
+        <p class="text-xs sm:text-sm text-stone-500">
+          Já sabe qual procedimento procura?
+          <button onclick="switchMode('catalog')" class="font-bold text-crimson hover:underline ml-1">
+            Explorar o catálogo completo dos 38 POPs →
+          </button>
+        </p>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- MODO 2: CATÁLOGO CLICÁVEL POR TEMAS (ORDEM INVERTIDA)               -->
+    <!-- ------------------------------------------------------------------- -->
+    <section id="catalogView" class="hidden fade-in">
+      <!-- Abas dos 5 Temas -->
+      <div class="mb-6">
+        <div class="flex items-center justify-between mb-2.5">
+          <span class="text-xs font-extrabold uppercase tracking-wider text-stone-500">Filtrar por Tema</span>
+          <span id="catalogCounter" class="text-xs font-bold text-crimson">38 procedimentos</span>
+        </div>
+        <div id="themeTabs" class="flex flex-wrap gap-2">
+          <!-- Renderizado via JS -->
+        </div>
+      </div>
+
+      <!-- Banner descritivo do Tema Selecionado -->
+      <div id="themeBanner" class="bg-white border border-stone-200 border-l-4 border-l-crimson rounded-r-xl p-4 sm:p-5 mb-6 shadow-sm">
+        <!-- Renderizado via JS -->
+      </div>
+
+      <!-- Grid de Cards Clicáveis (Ordem Invertida: Necessidade -> POP -> Título) -->
+      <div id="popCardsGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <!-- Renderizado via JS -->
+      </div>
+
+      <!-- Estado vazio na busca -->
+      <div id="emptySearchState" class="hidden bg-white border border-stone-200 rounded-xl p-8 text-center">
+        <p class="text-base font-bold text-stoneink">Nenhum procedimento encontrado para essa busca.</p>
+        <p class="text-sm text-stone-500 mt-1">Tente termos como "lento", "senha", "tela", "wi-fi", "vírus" ou "chamado".</p>
+        <button onclick="clearSearch()" class="mt-4 bg-crimson text-white text-xs font-bold px-4 py-2 rounded-lg hover:bg-crimson-dark transition">
+          Limpar filtro de busca
+        </button>
+      </div>
+    </section>
+
+    <!-- ------------------------------------------------------------------- -->
+    <!-- MODO 3: VISUALIZAÇÃO COMPLETA DO POP (SEM FORMATO DE LISTA)         -->
+    <!-- ------------------------------------------------------------------- -->
+    <section id="detailView" class="hidden fade-in">
+      <!-- Barra superior de navegação do POP -->
+      <div class="flex flex-wrap items-center justify-between gap-3 mb-5">
+        <div class="flex items-center gap-2">
+          <button onclick="backFromDetail()" class="inline-flex items-center gap-1.5 bg-white hover:bg-stone-100 text-stoneink border border-stone-300 text-xs sm:text-sm font-bold px-3.5 py-2 rounded-lg shadow-sm transition">
+            ← Voltar
+          </button>
+          <button onclick="switchMode('triage')" class="inline-flex items-center gap-1.5 bg-crimson-light hover:bg-rose-100 text-crimson border border-crimson-border text-xs sm:text-sm font-bold px-3.5 py-2 rounded-lg transition">
+            Refazer Triagem
+          </button>
+        </div>
+
+        <span id="detailThemeCrumb" class="text-xs font-extrabold uppercase tracking-wider text-stone-500">
+          <!-- Tema -->
+        </span>
+      </div>
+
+      <!-- Cartão Principal do POP -->
+      <article id="detailCard" class="bg-white border border-stone-200 rounded-2xl shadow-sm overflow-hidden">
+        <!-- Renderizado via JS -->
+      </article>
+
+      <!-- Navegação Anterior / Próximo POP -->
+      <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3" id="detailPrevNext">
+        <!-- Renderizado via JS -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ===================================================================== -->
+  <!-- RODAPÉ INSTITUCIONAL                                                  -->
+  <!-- ===================================================================== -->
+  <footer class="border-t border-stone-200 bg-white mt-12">
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-2 text-xs text-stone-500">
+      <span class="font-semibold text-stone-700">ECOVIS BPO • Departamento de Tecnologia da Informação (TI)</span>
+      <span>Manual Interativo de Procedimentos Operacionais Padrão (POP-001 a POP-038)</span>
+    </div>
+  </footer>
+
+  <!-- ===================================================================== -->
+  <!-- DADOS COMPLETOS DOS 38 POPS + ÁRVORE DE TRIAGEM INTELIGENTE           -->
+  <!-- ===================================================================== -->
+  <script>
+    // 1. DEFINIÇÃO DOS 5 TEMAS
+    const THEMES = [
+      {
+        id: 'all',
+        num: 'Todos',
+        name: 'Todos os 38 POPs',
+        desc: 'Visão completa de todos os procedimentos operacionais padrão da TI organizados pela necessidade do usuário.'
+      },
+      {
+        id: 1,
+        num: '01',
+        name: 'Windows e desempenho',
+        desc: 'Procedimentos para liberar espaço no SSD, identificar programas pesados, aliviar lentidão do OneDrive, controlar a inicialização e manter o Windows atualizado.'
+      },
+      {
+        id: 2,
+        num: '02',
+        name: 'Limpeza e conservação física',
+        desc: 'Cuidados práticos com tela, teclado, bateria, transporte, carregadores e ventilação para aumentar a vida útil do equipamento.'
+      },
+      {
+        id: 3,
+        num: '03',
+        name: 'Segurança digital',
+        desc: 'Controles obrigatórios para proteger informações corporativas, evitar golpes por e-mail e agir rapidamente diante de incidentes.'
+      },
+      {
+        id: 4,
+        num: '04',
+        name: 'Produtividade e usabilidade',
+        desc: 'Atalhos nativos do Windows, organização de pastas, ajuste de resolução/taxa de atualização em monitores, capturas de tela, áudio e sincronização com o OneDrive.'
+      },
+      {
+        id: 5,
+        num: '05',
+        name: 'Suporte e resolução de problemas',
+        desc: 'Roteiros de diagnóstico rápido antes de acionar a TI e orientações para abrir chamados completos que aceleram o atendimento.'
+      }
+    ];
+
+    // 2. ILUSTRAÇÕES INTERATIVAS / VISUAIS DO WINDOWS PARA OS POPS TÉCNICOS
+    const MOCKUPS = {
+      'POP-001': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Configurações — Windows</span>
+            <span class="tracking-widest text-slate-500">— □ ×</span>
+          </div>
+          <div class="p-4 sm:p-5 bg-white">
+            <div class="text-xs font-semibold text-slate-500 mb-3">
+              Sistema &gt; Armazenamento &gt; <span class="text-slate-900 font-bold">Arquivos temporários</span>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-left border-collapse text-xs sm:text-sm">
+                <thead>
+                  <tr class="bg-slate-100 text-slate-600 border-b border-slate-300">
+                    <th class="py-2 px-3 w-12">Sel.</th>
+                    <th class="py-2 px-3">Categoria de arquivo</th>
+                    <th class="py-2 px-3 text-right">Tamanho</th>
+                  </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                  <tr class="bg-rose-50/70 font-semibold text-slate-800">
+                    <td class="py-2 px-3 text-blue-600 font-bold">☑</td>
+                    <td class="py-2 px-3">Arquivos temporários da Internet e cache</td>
+                    <td class="py-2 px-3 text-right">1,42 GB</td>
+                  </tr>
+                  <tr class="bg-rose-50/70 font-semibold text-slate-800">
+                    <td class="py-2 px-3 text-blue-600 font-bold">☑</td>
+                    <td class="py-2 px-3">Arquivos de Otimização de Entrega</td>
+                    <td class="py-2 px-3 text-right">890 MB</td>
+                  </tr>
+                  <tr class="bg-rose-50/70 font-semibold text-slate-800">
+                    <td class="py-2 px-3 text-blue-600 font-bold">☑</td>
+                    <td class="py-2 px-3">Lixeira (itens excluídos anteriormente)</td>
+                    <td class="py-2 px-3 text-right">2,15 GB</td>
+                  </tr>
+                  <tr class="text-slate-700">
+                    <td class="py-2 px-3 text-slate-400 font-bold">☐</td>
+                    <td class="py-2 px-3">
+                      Downloads
+                      <span class="ml-2 inline-block bg-amber-100 text-amber-800 border border-amber-300 text-[11px] font-bold px-2 py-0.5 rounded">
+                        Manter desmarcado
+                      </span>
+                    </td>
+                    <td class="py-2 px-3 text-right">4,80 GB</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+            <div class="mt-4">
+              <span class="inline-block bg-blue-600 text-white text-xs font-bold px-3.5 py-2 rounded-md shadow-sm">
+                Remover arquivos (4,46 GB)
+              </span>
+            </div>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Ilustração da tela de limpeza de armazenamento do Windows, com dados de exemplo.
+          </div>
+        </div>
+      `,
+      'POP-003': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Gerenciador de Tarefas — Aplicativos de inicialização</span>
+            <span class="tracking-widest text-slate-500">— □ ×</span>
+          </div>
+          <div class="p-4 sm:p-5 bg-white overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-slate-100 text-slate-600 border-b border-slate-300">
+                  <th class="py-2 px-3">Nome do aplicativo</th>
+                  <th class="py-2 px-3">Status</th>
+                  <th class="py-2 px-3">Impacto na inicialização</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-slate-100">
+                <tr>
+                  <td class="py-2 px-3 font-medium">Windows Security / Antivírus Corporativo</td>
+                  <td class="py-2 px-3"><span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[11px] font-bold px-2 py-0.5 rounded">Habilitado</span></td>
+                  <td class="py-2 px-3 text-slate-600">Baixo (Manter ativo)</td>
+                </tr>
+                <tr>
+                  <td class="py-2 px-3 font-medium">Microsoft OneDrive</td>
+                  <td class="py-2 px-3"><span class="bg-emerald-100 text-emerald-800 border border-emerald-300 text-[11px] font-bold px-2 py-0.5 rounded">Habilitado</span></td>
+                  <td class="py-2 px-3 text-slate-600">Médio (Manter ativo)</td>
+                </tr>
+                <tr class="bg-rose-50/70 font-semibold">
+                  <td class="py-2 px-3 text-slate-900">Aplicativo Pessoal / Chat não utilizado</td>
+                  <td class="py-2 px-3"><span class="bg-amber-100 text-amber-800 border border-amber-300 text-[11px] font-bold px-2 py-0.5 rounded">Habilitado</span></td>
+                  <td class="py-2 px-3 text-crimson">Alto → Botão direito &gt; Desabilitar</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Ilustração da aba de inicialização do Gerenciador de Tarefas, com dados de exemplo.
+          </div>
+        </div>
+      `,
+      'POP-004': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Gerenciador de Tarefas — Desempenho</span>
+            <span class="tracking-widest text-slate-500">— □ ×</span>
+          </div>
+          <div class="p-4 sm:p-5 bg-white grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+              <div class="font-bold text-slate-700">CPU</div>
+              <div class="text-xl font-extrabold text-blue-600 mt-1">24%</div>
+              <div class="text-slate-500 mt-0.5">Normal (abaixo de 85%)</div>
+            </div>
+            <div class="border border-rose-300 rounded-lg p-3 bg-rose-50/70">
+              <div class="font-bold text-crimson">Memória (RAM)</div>
+              <div class="text-xl font-extrabold text-crimson mt-1">94%</div>
+              <div class="text-crimson font-semibold mt-0.5">Alerta: fechar abas abertas</div>
+            </div>
+            <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+              <div class="font-bold text-slate-700">Disco 0 (C: SSD)</div>
+              <div class="text-xl font-extrabold text-emerald-700 mt-1">12%</div>
+              <div class="text-slate-500 mt-0.5">Normal (abaixo de 85%)</div>
+            </div>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Ilustração dos indicadores de CPU, Memória e Disco na aba Desempenho.
+          </div>
+        </div>
+      `,
+      'POP-006': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Explorador de Arquivos — Este Computador</span>
+            <span class="tracking-widest text-slate-500">— □ ×</span>
+          </div>
+          <div class="p-4 sm:p-5 bg-white">
+            <div class="border border-slate-200 rounded-lg p-3.5 bg-slate-50 max-w-md">
+              <div class="text-sm font-bold text-slate-800">Disco Local (C:)</div>
+              <div class="w-full h-4 bg-slate-200 rounded overflow-hidden my-2">
+                <div class="h-full bg-blue-600" style="width: 68%;"></div>
+              </div>
+              <div class="text-xs text-slate-600 font-medium">
+                76,0 GB livres de 237 GB <span class="text-emerald-700 font-bold">(Saudável: manter acima de 15% livre)</span>
+              </div>
+            </div>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Ilustração da barra de espaço disponível no Explorador de Arquivos.
+          </div>
+        </div>
+      `,
+      'POP-008': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Configurações — Windows Update</span>
+            <span class="tracking-widest text-slate-500">— □ ×</span>
+          </div>
+          <div class="p-4 sm:p-5 bg-white flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div>
+              <div class="text-sm font-bold text-slate-900">Você está atualizado</div>
+              <div class="text-xs text-slate-500 mt-0.5">Gerenciado pela política de TI da ECOVIS BPO</div>
+            </div>
+            <span class="inline-block bg-blue-600 text-white text-xs font-bold px-3.5 py-2 rounded-md text-center">
+              Verificar se há atualizações
+            </span>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Ilustração do painel Windows Update nas Configurações do Windows.
+          </div>
+        </div>
+      `,
+      'POP-009': `
+        <div class="mt-6 border border-stone-200 rounded-xl overflow-hidden bg-white shadow-sm">
+          <div class="bg-stone-100 px-4 py-2 border-b border-stone-200 text-xs font-bold uppercase tracking-wider text-stone-600">
+            Guia Rápido de Materiais para Tela
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-stone-50 text-stone-600 border-b border-stone-200">
+                  <th class="py-2.5 px-4">Material / Produto</th>
+                  <th class="py-2.5 px-4">Pode usar?</th>
+                  <th class="py-2.5 px-4">Motivo</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100">
+                <tr>
+                  <td class="py-2.5 px-4 font-semibold">Pano de microfibra limpo</td>
+                  <td class="py-2.5 px-4"><span class="bg-emerald-100 text-emerald-800 text-xs font-bold px-2 py-0.5 rounded">Recomendado</span></td>
+                  <td class="py-2.5 px-4 text-stone-600">Não solta fiapos e não risca a película.</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-semibold">Álcool comum ou álcool em gel</td>
+                  <td class="py-2.5 px-4"><span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-0.5 rounded">Proibido</span></td>
+                  <td class="py-2.5 px-4 text-stone-600">Mancha e corrói o revestimento antirreflexo.</td>
+                </tr>
+                <tr>
+                  <td class="py-2.5 px-4 font-semibold">Papel toalha ou guardanapo</td>
+                  <td class="py-2.5 px-4"><span class="bg-red-100 text-red-800 text-xs font-bold px-2 py-0.5 rounded">Proibido</span></td>
+                  <td class="py-2.5 px-4 text-stone-600">Fibras rígidas provocam micro-riscos no visor.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `,
+      'POP-016': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Exemplo Visual de E-mail Suspeito (Phishing)</span>
+            <span class="text-crimson font-bold">Alerta de Segurança</span>
+          </div>
+          <div class="p-4 sm:p-5 bg-white text-xs sm:text-sm space-y-2">
+            <div class="bg-rose-50 border border-rose-200 text-crimson font-bold px-3 py-2 rounded-lg">
+              Sinal de golpe: Remetente externo imitando domínio da empresa + ameaça de bloqueio imediato
+            </div>
+            <div><strong class="text-stone-700">De:</strong> Suporte TI &lt;<code class="inline-code">suporte@ecov1s-bpo-alerta.com</code>&gt;</div>
+            <div><strong class="text-stone-700">Assunto:</strong> URGENTE: Sua senha expira em 30 minutos — clique para validar</div>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Nunca clique em links desse tipo; encaminhe a mensagem suspeita para a equipe de TI validar.
+          </div>
+        </div>
+      `,
+      'POP-022': `
+        <div class="mt-6 border border-stone-200 rounded-xl overflow-hidden bg-white shadow-sm">
+          <div class="bg-stone-100 px-4 py-2 border-b border-stone-200 text-xs font-bold uppercase tracking-wider text-stone-600">
+            Tabela Rápida de Atalhos do Windows
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-stone-50 text-stone-600 border-b border-stone-200">
+                  <th class="py-2.5 px-4 w-44">Atalho</th>
+                  <th class="py-2.5 px-4">O que faz no Windows</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100">
+                <tr><td class="py-2.5 px-4"><kbd>Win</kbd> + <kbd>L</kbd></td><td class="py-2.5 px-4">Bloqueia a tela imediatamente ao levantar da mesa.</td></tr>
+                <tr><td class="py-2.5 px-4"><kbd>Win</kbd> + <kbd>E</kbd></td><td class="py-2.5 px-4">Abre o Explorador de Arquivos (suas pastas e discos).</td></tr>
+                <tr><td class="py-2.5 px-4"><kbd>Alt</kbd> + <kbd>Tab</kbd></td><td class="py-2.5 px-4">Alterna rapidamente entre os programas e janelas abertas.</td></tr>
+                <tr><td class="py-2.5 px-4"><kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd></td><td class="py-2.5 px-4">Abre a Ferramenta de Captura para recortar um trecho da tela.</td></tr>
+                <tr><td class="py-2.5 px-4"><kbd>Win</kbd> + <kbd>V</kbd></td><td class="py-2.5 px-4">Abre o histórico de itens copiados recentemente.</td></tr>
+                <tr><td class="py-2.5 px-4"><kbd>Win</kbd> + <kbd>D</kbd></td><td class="py-2.5 px-4">Minimiza todas as janelas e exibe a Área de Trabalho.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `,
+      'POP-025': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Configurações — Sistema &gt; Tela</span>
+            <span class="tracking-widest text-slate-500">— □ ×</span>
+          </div>
+          <div class="p-5 bg-white text-center">
+            <div class="inline-flex items-end gap-3 my-2">
+              <div class="w-24 h-16 border-2 border-slate-500 rounded-md flex items-center justify-center text-xs font-bold bg-slate-100 text-slate-700">
+                1 (Notebook)
+              </div>
+              <div class="w-36 h-24 border-2 border-blue-600 rounded-md flex items-center justify-center text-xs font-bold bg-blue-50 text-blue-700">
+                2 (Monitor Externo)
+              </div>
+            </div>
+            <div class="mt-3 flex flex-wrap items-center justify-center gap-3 text-xs">
+              <span class="bg-white border border-slate-400 px-3 py-1 rounded font-semibold text-slate-800">Identificar</span>
+              <span class="text-slate-600">Modo selecionado: <strong>Estender estes vídeos</strong></span>
+            </div>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Ilustração do arranjo de múltiplos monitores nas Configurações de Tela do Windows.
+          </div>
+        </div>
+      `,
+      'POP-036': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Microsoft OneDrive — Bandeja do Sistema</span>
+            <span class="text-crimson font-bold">✕ Erro de sincronização</span>
+          </div>
+          <div class="p-4 sm:p-5 bg-white space-y-4">
+            <div class="flex flex-wrap items-center justify-between gap-3 bg-rose-50 border border-rose-200 rounded-lg p-3">
+              <div class="flex items-center gap-2.5">
+                <span class="w-7 h-7 rounded-full bg-crimson text-white font-extrabold text-xs flex items-center justify-center">✕</span>
+                <div>
+                  <div class="text-xs sm:text-sm font-bold text-slate-900">1 erro de sincronização — ECOVIS BPO</div>
+                  <div class="text-xs text-slate-600">Verifique se há caracteres inválidos ou se a sincronização está pausada</div>
+                </div>
+              </div>
+              <span class="bg-white border border-slate-300 text-slate-800 text-xs font-bold px-2.5 py-1 rounded shadow-sm">
+                ⚙ Ajuda e Configurações
+              </span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+                <div class="font-bold text-slate-800 mb-1">1. Menu da Engrenagem (⚙)</div>
+                <div class="text-slate-600">Clique em <strong class="text-blue-700">Retomar sincronização</strong> caso esteja pausada, ou em <strong>Fechar o OneDrive</strong> para reiniciar o cliente.</div>
+              </div>
+              <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+                <div class="font-bold text-slate-800 mb-1">2. Configurações &gt; Aba Conta</div>
+                <div class="text-slate-600">Se o erro continuar, clique em <strong class="text-crimson">Desvincular este computador</strong> e entre novamente com seu e-mail corporativo.</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Ilustração do painel de status e menu de engrenagem do OneDrive na barra de tarefas.
+          </div>
+        </div>
+      `,
+      'POP-037': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Configurações do OneDrive — Sincronização e backup</span>
+            <span class="tracking-widest text-slate-500">— □ ×</span>
+          </div>
+          <div class="p-4 sm:p-5 bg-white space-y-3 text-xs sm:text-sm">
+            <div class="flex items-center justify-between border border-emerald-200 bg-emerald-50/70 rounded-lg p-3">
+              <div>
+                <div class="font-bold text-slate-900">Arquivos Sob Demanda (Files On-Demand)</div>
+                <div class="text-xs text-slate-600">Economiza espaço no SSD e reduz uso contínuo de internet</div>
+              </div>
+              <span class="bg-emerald-600 text-white text-xs font-extrabold px-2.5 py-1 rounded-full">Ativado</span>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+              <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+                <div class="font-bold text-slate-800">Explorador de Arquivos</div>
+                <div class="text-slate-600 mt-1">Botão direito na pasta &gt; <strong class="text-blue-700">Liberar espaço</strong> (mantém o arquivo apenas na nuvem).</div>
+              </div>
+              <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+                <div class="font-bold text-slate-800">Durante reuniões ou lentidão</div>
+                <div class="text-slate-600 mt-1">Engrenagem &gt; <strong class="text-amber-700">Pausar sincronização &gt; 2 horas</strong> ou limitar taxa de upload.</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Ilustração das opções de Arquivos Sob Demanda e controle de banda nas Configurações do OneDrive.
+          </div>
+        </div>
+      `,
+      'POP-038': `
+        <div class="mt-6 border border-stone-300 rounded-xl overflow-hidden bg-slate-50 shadow-sm">
+          <div class="bg-slate-200 px-4 py-2 flex items-center justify-between border-b border-slate-300 text-xs font-semibold text-slate-700">
+            <span>Configurações — Sistema &gt; Tela &gt; Exibição avançada</span>
+            <span class="tracking-widest text-slate-500">— □ ×</span>
+          </div>
+          <div class="p-4 sm:p-5 bg-white space-y-3 text-xs sm:text-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              <div class="border border-slate-200 rounded-lg p-3 bg-slate-50">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-slate-500">1. Escala e layout</div>
+                <div class="font-bold text-slate-900 mt-1">Resolução de tela</div>
+                <div class="mt-1.5 bg-white border border-slate-300 rounded px-2.5 py-1.5 text-xs font-semibold text-slate-800 flex justify-between items-center">
+                  <span>1600 × 900 (ou 1366 × 768)</span>
+                  <span>▾</span>
+                </div>
+                <div class="text-[11px] text-slate-500 mt-1">Reduzida para eliminar erro de escala</div>
+              </div>
+
+              <div class="border-2 border-crimson rounded-lg p-3 bg-rose-50/50">
+                <div class="text-[11px] font-bold uppercase tracking-wider text-crimson">2. Exibição avançada</div>
+                <div class="font-bold text-slate-900 mt-1">Escolher uma taxa de atualização</div>
+                <div class="mt-1.5 bg-white border border-crimson rounded px-2.5 py-1.5 text-xs font-extrabold text-crimson flex justify-between items-center">
+                  <span>50 Hz (abaixo de 59Hz)</span>
+                  <span>▾</span>
+                </div>
+                <div class="text-[11px] text-crimson font-semibold mt-1">Obrigatório para estabilizar o monitor</div>
+              </div>
+            </div>
+          </div>
+          <div class="bg-stone-100 px-4 py-2 text-xs text-stone-500 italic border-t border-stone-200">
+            Ilustração do ajuste conjunto de Resolução reduzida e Taxa de atualização abaixo de 59Hz (50 Hz).
+          </div>
+        </div>
+      `,
+      'POP-033': `
+        <div class="mt-6 border border-stone-200 rounded-xl overflow-hidden bg-white shadow-sm">
+          <div class="bg-stone-100 px-4 py-2 border-b border-stone-200 text-xs font-bold uppercase tracking-wider text-stone-600">
+            Checklist para Abertura Rápida de Chamado
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-left border-collapse text-xs sm:text-sm">
+              <thead>
+                <tr class="bg-stone-50 text-stone-600 border-b border-stone-200">
+                  <th class="py-2.5 px-4 w-48">Informação</th>
+                  <th class="py-2.5 px-4">Por que acelera o atendimento técnico</th>
+                </tr>
+              </thead>
+              <tbody class="divide-y divide-stone-100">
+                <tr><td class="py-2.5 px-4 font-bold">Patrimônio / Hostname</td><td class="py-2.5 px-4 text-stone-600">Permite que o analista identifique e acesse remotamente seu equipamento na hora.</td></tr>
+                <tr><td class="py-2.5 px-4 font-bold">Print da tela de erro</td><td class="py-2.5 px-4 text-stone-600">Mostra o código exato da falha sem necessidade de retrabalho ou novas perguntas.</td></tr>
+                <tr><td class="py-2.5 px-4 font-bold">Impacto no trabalho</td><td class="py-2.5 px-4 text-stone-600">Ajuda a priorizar casos em que o colaborador está totalmente impedido de trabalhar.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      `
+    };
+
+    // 3. TODOS OS 35 POPS COMPLETOS (COM ORDEM INVERTIDA: NECESSIDADE PRIMEIRO)
+    const POPS = [
+      // TEMA 1: WINDOWS E DESEMPENHO (POP-001 a POP-008)
+      {
+        code: 'POP-001',
+        themeId: 1,
+        goal: 'Para liberar espaço com segurança',
+        title: 'Como limpar arquivos temporários',
+        keywords: 'limpar espaco disco cheio memoria temporarios cache lixeira downloads',
+        steps: [
+          { lead: 'Abra as Configurações do Windows', text: 'Pressione <kbd>Win</kbd> + <kbd>I</kbd> no teclado (ou clique no menu <strong>Iniciar</strong> e no ícone de engrenagem <strong>Configurações</strong>).' },
+          { lead: 'Entre em Sistema > Armazenamento', text: 'No menu lateral esquerdo, clique em <strong>Sistema</strong> e depois em <strong>Armazenamento</strong>. Aguarde alguns segundos até o Windows calcular o tamanho das pastas.' },
+          { lead: 'Clique em Arquivos temporários', text: 'Na lista de categorias do disco, selecione <strong>Arquivos temporários</strong> para visualizar o que pode ser apagado sem risco.' },
+          { lead: 'Marque apenas itens seguros e clique em Remover arquivos', text: 'Deixe marcadas opções como <em>Arquivos temporários da Internet</em>, <em>Miniaturas</em> e <em>Lixeira</em>. <strong>Desmarque a pasta Downloads</strong> caso guarde documentos importantes lá.' }
+        ]
+      },
+      {
+        code: 'POP-002',
+        themeId: 1,
+        goal: 'Para melhorar o desempenho',
+        title: 'Como identificar programas que deixam o notebook lento',
+        keywords: 'lento lentidao travando pesado programas processos consumo',
+        steps: [
+          { lead: 'Abra o Gerenciador de Tarefas', text: 'Pressione juntas as teclas <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd>. Se aparecer uma janela compacta, clique em <strong>Mais detalhes</strong> na parte inferior.' },
+          { lead: 'Ordene pela coluna CPU ou Memória', text: 'Na aba <strong>Processos</strong>, clique diretamente sobre o título da coluna <strong>CPU</strong> (ou <strong>Memória</strong>). Uma seta indicará os programas que mais consomem recursos no topo.' },
+          { lead: 'Feche aplicativos desnecessários', text: 'Observe quais programas em aberto (navegadores com muitas abas, reprodutores ou utilitários sem uso) estão no topo e feche-os normalmente pela janela do próprio programa.' }
+        ]
+      },
+      {
+        code: 'POP-003',
+        themeId: 1,
+        goal: 'Para reduzir o tempo de inicialização',
+        title: 'Como gerenciar programas de inicialização',
+        keywords: 'ligar demora iniciar boot inicializacao lento ao ligar',
+        steps: [
+          { lead: 'Acesse a aba Aplicativos de inicialização', text: 'No <strong>Gerenciador de Tarefas</strong> (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd>), clique na aba <strong>Aplicativos de inicialização</strong> no menu lateral ou superior.' },
+          { lead: 'Avalie o Impacto na inicialização', text: 'Verifique os programas marcados como <strong>Habilitado</strong> e observe a coluna <em>Impacto na inicialização</em> (Alto, Médio ou Baixo).' },
+          { lead: 'Desabilite itens não essenciais', text: 'Clique com o botão direito sobre aplicativos pessoais ou não críticos e escolha <strong>Desabilitar</strong>. Nunca desative o antivírus corporativo nem o OneDrive.' }
+        ]
+      },
+      {
+        code: 'POP-004',
+        themeId: 1,
+        goal: 'Para identificar causas de lentidão',
+        title: 'Como verificar o consumo de CPU, RAM e disco',
+        keywords: 'cpu ram memoria disco 100% desempenho lento gargalo',
+        steps: [
+          { lead: 'Abra a aba Desempenho', text: 'No <strong>Gerenciador de Tarefas</strong> (<kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd>), clique no ícone de gráfico chamado <strong>Desempenho</strong>.' },
+          { lead: 'Leia os percentuais de uso', text: 'Clique em <strong>CPU</strong>, <strong>Memória</strong> e <strong>Disco</strong> à esquerda. Se algum deles permanecer travado entre <strong>90% e 100%</strong> por vários minutos, há sobrecarga no equipamento.' },
+          { lead: 'Aja conforme o componente sobrecarregado', text: 'Memória cheia pede o fechamento de abas do navegador; Disco em 100% costuma indicar atualização do Windows em andamento — aguarde alguns minutos e reinicie.' }
+        ]
+      },
+      {
+        code: 'POP-005',
+        themeId: 1,
+        goal: 'Para resolver problemas temporários',
+        title: 'Como reiniciar corretamente o Windows',
+        keywords: 'reiniciar desligar bug falha temporaria limpar memoria',
+        steps: [
+          { lead: 'Salve e feche todos os arquivos', text: 'Guarde alterações em planilhas, textos e sistemas web para evitar perda de trabalho.' },
+          { lead: 'Use a opção Reiniciar (e não Desligar)', text: 'Clique em <strong>Iniciar &gt; Ligar/Desligar &gt; Reiniciar</strong>. No Windows moderno, <em>Desligar</em> apenas hiberna o núcleo do sistema para ligar mais rápido; somente <strong>Reiniciar</strong> limpa a memória por completo.' }
+        ]
+      },
+      {
+        code: 'POP-006',
+        themeId: 1,
+        goal: 'Para evitar armazenamento cheio',
+        title: 'Como verificar o espaço disponível no SSD',
+        keywords: 'ssd disco c cheio espaco livre gb armazenamento',
+        steps: [
+          { lead: 'Abra o Explorador de Arquivos', text: 'Pressione <kbd>Win</kbd> + <kbd>E</kbd> e clique em <strong>Este Computador</strong> no painel esquerdo.' },
+          { lead: 'Confira a barra do Disco Local (C:)', text: 'Observe o espaço livre abaixo da barra azul. Se a barra ficar <strong>vermelha</strong> (menos de 10% livre), o Windows perde velocidade e pode falhar ao salvar arquivos. Mantenha sempre ao menos <strong>15% a 20% livres</strong>.' }
+        ]
+      },
+      {
+        code: 'POP-007',
+        themeId: 1,
+        goal: 'Para identificar aplicativos travados',
+        title: 'Como utilizar o Gerenciador de Tarefas',
+        keywords: 'gerenciador de tarefas nao respondendo congelou finalizar tarefa',
+        steps: [
+          { lead: 'Acione o atalho de emergência', text: 'Pressione <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd> (ou pressione <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Del</kbd> e clique em <strong>Gerenciador de Tarefas</strong>).' },
+          { lead: 'Localize o programa com status "Não respondendo"', text: 'Na lista de aplicativos abertos, clique sobre o programa que congelou.' },
+          { lead: 'Clique em Finalizar tarefa', text: 'Use o botão <strong>Finalizar tarefa</strong> para encerrar apenas o programa travado sem precisar desligar o notebook inteiro.' }
+        ]
+      },
+      {
+        code: 'POP-008',
+        themeId: 1,
+        goal: 'Para manter o sistema atualizado conforme a política de TI',
+        title: 'Como utilizar o Windows Update',
+        keywords: 'windows update atualizar atualizacao seguranca sistema',
+        steps: [
+          { lead: 'Abra o painel Windows Update', text: 'Pressione <kbd>Win</kbd> + <kbd>I</kbd> e clique em <strong>Windows Update</strong> no menu lateral esquerdo.' },
+          { lead: 'Verifique e baixe as atualizações aprovadas', text: 'Clique em <strong>Verificar se há atualizações</strong>. O sistema baixará automaticamente os pacotes liberados pela política de TI da empresa.' },
+          { lead: 'Reinicie no fim do expediente', text: 'Quando aparecer o aviso <em>Reinicialização necessária</em>, conclua a atualização ao final do dia de trabalho para não interromper reuniões.' }
+        ]
+      },
+
+      // TEMA 2: LIMPEZA E CONSERVAÇÃO FÍSICA (POP-009 a POP-014)
+      {
+        code: 'POP-009',
+        themeId: 2,
+        goal: 'Para evitar danos ao display',
+        title: 'Como limpar a tela corretamente',
+        keywords: 'limpar tela monitor display mancha microfibra alcool',
+        steps: [
+          { lead: 'Desligue o notebook', text: 'Desligue o equipamento para enxergar melhor marcas de dedos e evitar toques acidentais.' },
+          { lead: 'Passe um pano de microfibra seco', text: 'Faça movimentos suaves e circulares sem pressionar o painel LCD/LED.' },
+          { lead: 'Para manchas persistentes, umedeça levemente o pano', text: 'Aplique apenas algumas gotas de água destilada ou limpa-telas específico <strong>no pano de microfibra</strong> (nunca direto na tela) e seque em seguida com o lado seco do pano.' }
+        ]
+      },
+      {
+        code: 'POP-010',
+        themeId: 2,
+        goal: 'Para conservar os periféricos',
+        title: 'Como higienizar teclado e touchpad',
+        keywords: 'limpar teclado touchpad teclas higienizar sujeira alcool isopropilico',
+        steps: [
+          { lead: 'Desligue e desconecte da tomada', text: 'Remova o cabo de energia e qualquer dispositivo USB antes de iniciar a limpeza.' },
+          { lead: 'Remova poeira solta', text: 'Incline o notebook levemente de lado e passe um pincel macio ou pano seco entre as teclas.' },
+          { lead: 'Higienize com álcool isopropílico (70%+)', text: 'Umedeça levemente um pano de microfibra com <strong>álcool isopropílico</strong> (que evapora rápido e não oxida circuitos), limpe teclas e touchpad e aguarde 2 minutos antes de ligar.' }
+        ]
+      },
+      {
+        code: 'POP-011',
+        themeId: 2,
+        goal: 'Para reduzir o desgaste da bateria',
+        title: 'Como preservar a bateria',
+        keywords: 'bateria carregar descarregar vida util autonomia tomada',
+        steps: [
+          { lead: 'Evite zerar a bateria com frequência', text: 'Conecte o carregador sempre que a carga chegar por volta de <strong>20%</strong>. Descargas completas constantes aceleram o desgaste químico das células.' },
+          { lead: 'Proteja contra calor excessivo', text: 'Nunca deixe o notebook dentro do carro ao sol ou operando sobre superfícies que abafam o calor.' },
+          { lead: 'Faça ciclos ocasionais se usar sempre na tomada', text: 'Caso trabalhe o tempo todo conectado à energia, utilize o notebook na bateria até cerca de 30% uma vez a cada duas semanas.' }
+        ]
+      },
+      {
+        code: 'POP-012',
+        themeId: 2,
+        goal: 'Para evitar danos físicos',
+        title: 'Como transportar o notebook',
+        keywords: 'transportar mochila levar viagem tampa tela quebrar',
+        steps: [
+          { lead: 'Verifique o teclado antes de fechar a tampa', text: 'Certifique-se de que não há canetas, fones de ouvido, clipes ou cabos sobre o teclado — fechar a tampa sobre objetos trinca a tela imediatamente.' },
+          { lead: 'Desligue ou hiberne antes de guardar na mochila', text: 'Nunca guarde o notebook ligado ou apenas em suspensão dentro de mochilas fechadas, pois ele pode despertar e superaquecer sem ventilação.' },
+          { lead: 'Use compartimento acolchoado e segure pela base', text: 'Transporte em mochila ou pasta com divisória acolchoada dedicada e nunca segure o aparelho aberto apenas pela borda da tela.' }
+        ]
+      },
+      {
+        code: 'POP-013',
+        themeId: 2,
+        goal: 'Para evitar danos elétricos',
+        title: 'Cuidados com carregadores e cabos',
+        keywords: 'carregador fonte cabo fio energia tomada curto',
+        steps: [
+          { lead: 'Utilize apenas a fonte original ou homologada', text: 'Fontes genéricas com voltagem ou amperagem incompatíveis danificam a placa-mãe e a bateria.' },
+          { lead: 'Enrole os cabos sem dobrar as pontas', text: 'Faça laços largos ao guardar o carregador, evitando tensionar ou dobrar o fio junto ao conector da fonte ou do notebook.' },
+          { lead: 'Desconecte segurando pelo plugue', text: 'Puxe sempre pelo conector rígido, nunca pelo cabo. Caso note fio desencapado, mau contato ou cheiro de queimado, suspenda o uso e acione a TI.' }
+        ]
+      },
+      {
+        code: 'POP-014',
+        themeId: 2,
+        goal: 'Para melhorar a ventilação do equipamento',
+        title: 'Como evitar superaquecimento',
+        keywords: 'quente esquentando superaquecimento cooler ventilacao barulho',
+        steps: [
+          { lead: 'Use sempre sobre superfícies rígidas e planas', text: 'Apoie o notebook em mesas ou suportes ergonômicos que deixem a base livre para circulação de ar.' },
+          { lead: 'Evite camas, sofás e almofadas', text: 'Tecidos macios bloqueiam as entradas de ar inferiores do cooler, causando aquecimento excessivo e redução automática de velocidade.' },
+          { lead: 'Mantenha as saídas de ar desobstruídas', text: 'Não encoste papéis, livros ou objetos nas aberturas laterais e traseiras de exaustão de calor.' }
+        ]
+      },
+
+      // TEMA 3: SEGURANÇA DIGITAL (POP-015 a POP-021)
+      {
+        code: 'POP-015',
+        themeId: 3,
+        goal: 'Para proteger informações corporativas',
+        title: 'Como bloquear a tela ao se ausentar',
+        keywords: 'bloquear tela sair mesa senha win l privacidade',
+        steps: [
+          { lead: 'Pressione Win + L sempre que levantar da mesa', text: 'Mesmo que seja para ir ao café, banheiro ou falar com um colega ao lado, pressione <kbd>Win</kbd> + <kbd>L</kbd>.' },
+          { lead: 'Confirme a tela de bloqueio antes de sair', text: 'Certifique-se de que a tela solicitando sua senha ou PIN apareceu antes de afastar-se do notebook.' }
+        ]
+      },
+      {
+        code: 'POP-016',
+        themeId: 3,
+        goal: 'Para prevenir ataques de phishing',
+        title: 'Como identificar e-mails suspeitos',
+        keywords: 'email suspeito phishing golpe link boleto falso spam',
+        steps: [
+          { lead: 'Confira o endereço real do remetente', text: 'Não olhe apenas o nome exibido; verifique o domínio após o <code class="inline-code">@</code> para detectar trocas sutis de letras (ex.: <code class="inline-code">@ecov1s-suporte.com</code>).' },
+          { lead: 'Desconfie de urgência, ameaças ou pedidos de senha', text: 'Mensagens sobre bloqueio imediato de conta, boletos inesperados ou atualização cadastral urgente são sinais clássicos de golpe.' },
+          { lead: 'Passe o mouse sobre links sem clicar', text: 'Veja o endereço real que aparece no canto da tela antes de abrir qualquer link e nunca execute anexos desconhecidos (<em>.exe, .zip, .scr, .js</em>). Em dúvida, encaminhe para a TI validar.' }
+        ]
+      },
+      {
+        code: 'POP-017',
+        themeId: 3,
+        goal: 'Para evitar acessos não autorizados',
+        title: 'Como criar e proteger senhas',
+        keywords: 'senha criar trocar forte mfa autenticacao',
+        steps: [
+          { lead: 'Crie senhas longas e exclusivas', text: 'Use no mínimo <strong>12 caracteres</strong> combinando letras maiúsculas, minúsculas, números e símbolos (ou uma frase-senha longa e fácil de lembrar).' },
+          { lead: 'Nunca reutilize a senha da empresa', text: 'Jamais use a mesma senha corporativa em lojas, redes sociais ou cadastros pessoais.' },
+          { lead: 'Mantenha a Autenticação Multifator (MFA) ativa', text: 'Não anote senhas em post-its no monitor, cadernos na mesa ou blocos de notas sem proteção.' }
+        ]
+      },
+      {
+        code: 'POP-018',
+        themeId: 3,
+        goal: 'Para reduzir riscos de malware',
+        title: 'Como utilizar dispositivos USB com segurança',
+        keywords: 'usb pendrive hd externo malware antivirus ejetar',
+        steps: [
+          { lead: 'Nunca conecte pendrives desconhecidos', text: 'Dispositivos encontrados em estacionamentos, recepções ou entregues sem origem confiável podem conter códigos maliciosos automáticos.' },
+          { lead: 'Passe o antivírus antes de abrir arquivos', text: 'Ao conectar um dispositivo autorizado, abra o Explorador de Arquivos (<kbd>Win</kbd> + <kbd>E</kbd>), clique com o botão direito sobre a unidade USB e selecione <strong>Verificar com o antivírus</strong>.' },
+          { lead: 'Ejete com segurança antes de puxar', text: 'Clique no ícone de USB na barra de tarefas (canto inferior direito) e selecione <strong>Ejetar</strong> para não corromper dados.' }
+        ]
+      },
+      {
+        code: 'POP-019',
+        themeId: 3,
+        goal: 'Para evitar perda de dados',
+        title: 'Como armazenar arquivos corporativos',
+        keywords: 'salvar arquivos backup onedrive sharepoint rede nuvem',
+        steps: [
+          { lead: 'Salve sempre nos repositórios oficiais', text: 'Guarde seus documentos no <strong>OneDrive corporativo</strong>, SharePoint ou pastas de rede definidas pela empresa — assim há backup automático em caso de defeito ou roubo do notebook.' },
+          { lead: 'Não deixe arquivos críticos apenas em Downloads', text: 'Pastas locais sem sincronização não possuem recuperação automática em caso de falha do disco.' }
+        ]
+      },
+      {
+        code: 'POP-020',
+        themeId: 3,
+        goal: 'Para orientar a resposta inicial a incidentes',
+        title: 'O que fazer ao suspeitar de vírus',
+        keywords: 'virus malware ransomware cliquei link estranho invasao',
+        steps: [
+          { lead: 'Desconecte o notebook da internet imediatamente', text: 'Desative o Wi-Fi ou retire o cabo de rede na hora para impedir que a ameaça se espalhe pela rede da empresa ou envie dados para fora.' },
+          { lead: 'Não desligue bruscamente nem apague arquivos', text: 'Mantenha o equipamento como está para que a equipe técnica possa investigar e conter o incidente.' },
+          { lead: 'Avise a TI imediatamente', text: 'Entre em contato por telefone ou pelo celular corporativo informando o ocorrido e o que foi clicado.' }
+        ]
+      },
+      {
+        code: 'POP-021',
+        themeId: 3,
+        goal: 'Para proteger conexões e informações',
+        title: 'Como utilizar redes Wi-Fi externas',
+        keywords: 'wifi externo hotel aeroporto cafe vpn rede publica home office',
+        steps: [
+          { lead: 'Prefira o roteamento do celular (4G/5G)', text: 'Evite redes públicas abertas de aeroportos, cafés, shoppings e hotéis sempre que possível.' },
+          { lead: 'Conecte a VPN corporativa antes de trabalhar', text: 'Se precisar usar um Wi-Fi externo, ative obrigatoriamente a <strong>VPN da empresa</strong> antes de acessar sistemas internos, e-mails ou arquivos.' }
+        ]
+      },
+
+      // TEMA 4: PRODUTIVIDADE E USABILIDADE (POP-022 a POP-028)
+      {
+        code: 'POP-022',
+        themeId: 4,
+        goal: 'Para agilizar tarefas diárias',
+        title: 'Atalhos essenciais do Windows',
+        keywords: 'atalhos teclado produtividade rapido teclas',
+        steps: [
+          { lead: 'Memorize os 6 atalhos de maior ganho diário', text: 'Use a tabela de referência rápida abaixo para bloquear a tela, abrir pastas, alternar janelas e capturar telas sem tirar as mãos do teclado.' }
+        ]
+      },
+      {
+        code: 'POP-023',
+        themeId: 4,
+        goal: 'Para melhorar a organização digital',
+        title: 'Como organizar arquivos e pastas',
+        keywords: 'organizar pastas nomes arquivos padronizar area de trabalho',
+        steps: [
+          { lead: 'Crie pastas por área, projeto ou ano', text: 'Evite salvar dezenas de arquivos soltos na Área de Trabalho; agrupe por assunto ou cliente.' },
+          { lead: 'Padronize o nome dos arquivos', text: 'Use formatos fáceis de ordenar, como <code class="inline-code">2026-11_Relatorio_Mensal_v1</code>, e evite caracteres especiais (<code class="inline-code">/ \\ : * ? " &lt; &gt; |</code>) que causam erros de sincronização.' }
+        ]
+      },
+      {
+        code: 'POP-024',
+        themeId: 4,
+        goal: 'Para facilitar a execução de múltiplas tarefas',
+        title: 'Como utilizar múltiplas janelas',
+        keywords: 'dividir tela duas janelas lado a lado multitarefa',
+        steps: [
+          { lead: 'Encaixe duas janelas lado a lado', text: 'Com uma janela ativa, pressione <kbd>Win</kbd> + <kbd>Seta Esquerda</kbd>. Ela ocupará metade da tela e o Windows sugerirá automaticamente outra janela para preencher o lado direito.' },
+          { lead: 'Separe tarefas por Áreas de Trabalho Virtuais', text: 'Pressione <kbd>Win</kbd> + <kbd>Tab</kbd> e clique em <strong>Nova área de trabalho</strong> no topo para separar janelas de reuniões e de operação.' }
+        ]
+      },
+      {
+        code: 'POP-025',
+        themeId: 4,
+        goal: 'Para melhorar a produtividade e a ergonomia',
+        title: 'Como configurar monitores externos',
+        keywords: 'monitor externo segunda tela hdmi estender duplicar ergonomia',
+        steps: [
+          { lead: 'Conecte o cabo de vídeo e pressione Win + P', text: 'Após ligar o cabo HDMI, DisplayPort ou USB-C, pressione <kbd>Win</kbd> + <kbd>P</kbd> e selecione <strong>Estender</strong> para usar as duas telas de forma independente.' },
+          { lead: 'Alinhe a posição física das telas', text: 'Abra <strong>Configurações &gt; Sistema &gt; Tela</strong> (<kbd>Win</kbd> + <kbd>I</kbd>), clique em <strong>Identificar</strong> para ver qual tela é a 1 e qual é a 2, e arraste os retângulos para corresponder ao lado em que o monitor está na sua mesa.' },
+          { lead: 'Ajuste a altura ergonômica', text: 'Posicione o topo do monitor principal na altura da linha dos seus olhos para evitar tensão cervical.' }
+        ]
+      },
+      {
+        code: 'POP-026',
+        themeId: 4,
+        goal: 'Para facilitar a comunicação e o suporte',
+        title: 'Como realizar capturas de tela',
+        keywords: 'print screen captura tela recorte imagem foto tela',
+        steps: [
+          { lead: 'Acione a Ferramenta de Captura', text: 'Pressione <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd>. A tela escurecerá levemente e aparecerá uma barra pequena no topo.' },
+          { lead: 'Selecione a área desejada e cole', text: 'Arraste o mouse sobre a mensagem de erro ou tela que deseja mostrar. A imagem fica salva na memória — basta pressionar <kbd>Ctrl</kbd> + <kbd>V</kbd> no e-mail, Teams ou chamado de TI.' }
+        ]
+      },
+      {
+        code: 'POP-027',
+        themeId: 4,
+        goal: 'Para resolver problemas em reuniões',
+        title: 'Como configurar áudio e microfone',
+        keywords: 'audio som microfone fone headset reuniao teams zoom mudo',
+        steps: [
+          { lead: 'Escolha a saída de som correta na barra de tarefas', text: 'Clique no ícone de <strong>alto-falante</strong> no canto inferior direito da tela e selecione seu fone/headset (ou os alto-falantes do notebook).' },
+          { lead: 'Verifique o microfone nas Configurações de Som', text: 'Acesse <strong>Configurações &gt; Sistema &gt; Som</strong> e confira em <em>Entrada</em> se o microfone correto está selecionado e se a barra azul se move quando você fala.' },
+          { lead: 'Confirme dentro do aplicativo da reunião', text: 'No Teams, Zoom ou Google Meet, clique nos três pontinhos (<strong>Configurações de dispositivo</strong>) e garanta que o mesmo headset esteja escolhido para áudio e microfone.' }
+        ]
+      },
+      {
+        code: 'POP-028',
+        themeId: 4,
+        goal: 'Para sincronizar arquivos, quando adotado pela empresa',
+        title: 'Como utilizar corretamente o OneDrive',
+        keywords: 'onedrive nuvem sincronizar sincronizacao erro x vermelho',
+        steps: [
+          { lead: 'Confira o ícone de nuvem na barra de tarefas', text: 'Clique na nuvem azul do <strong>OneDrive</strong> perto do relógio do Windows e verifique se aparece a mensagem <em>Seus arquivos estão sincronizados</em>.' },
+          { lead: 'Atenção a ícones vermelhos ou pausados', text: 'Se aparecer um "X" vermelho ou ícone de pausa, clique sobre a nuvem para ver qual arquivo está com nome inválido ou aberto bloqueando a sincronização.' }
+        ]
+      },
+
+      // TEMA 5: SUPORTE E RESOLUÇÃO DE PROBLEMAS (POP-029 a POP-035)
+      {
+        code: 'POP-029',
+        themeId: 5,
+        goal: 'Para realizar diagnóstico inicial de rede',
+        title: 'Notebook não conecta ao Wi-Fi',
+        keywords: 'wifi nao conecta internet sem rede modo aviao senha wifi',
+        steps: [
+          { lead: 'Confira o Modo Avião e o botão de Wi-Fi', text: 'Clique no ícone de rede ao lado do relógio e verifique se o <strong>Modo Avião</strong> está desligado e o <strong>Wi-Fi</strong> está ativado.' },
+          { lead: 'Desconecte e reconecte à rede', text: 'Clique em <strong>Desconectar</strong> na rede atual, aguarde 10 segundos e conecte novamente. Se a senha da rede mudou recentemente, clique com o botão direito na rede, escolha <strong>Esquecer</strong> e digite a nova senha.' },
+          { lead: 'Teste outro aparelho e reinicie o Windows', text: 'Verifique se seu celular conecta ao mesmo Wi-Fi. Se o celular funciona e o notebook não, reinicie o Windows pelo menu Iniciar (<button onclick="openPop(\'POP-005\')" class="text-crimson font-bold underline">POP-005</button>).' }
+        ]
+      },
+      {
+        code: 'POP-030',
+        themeId: 5,
+        goal: 'Para executar checklist básico de desempenho',
+        title: 'Notebook está lento: o que fazer?',
+        keywords: 'notebook lento checklist o que fazer travando devagar',
+        steps: [
+          { lead: 'Feche abas e programas pesados', text: 'Abra o Gerenciador de Tarefas (<button onclick="openPop(\'POP-002\')" class="text-crimson font-bold underline">POP-002</button>) e encerre aplicativos que não estão sendo usados no momento.' },
+          { lead: 'Verifique o espaço no SSD e o Windows Update', text: 'Confira se há ao menos 15% de espaço livre no Disco C: (<button onclick="openPop(\'POP-006\')" class="text-crimson font-bold underline">POP-006</button>) e se o Windows não está baixando atualizações grandes em segundo plano (<button onclick="openPop(\'POP-008\')" class="text-crimson font-bold underline">POP-008</button>).' },
+          { lead: 'Reinicie o equipamento', text: 'Execute uma reinicialização completa pelo menu <strong>Iniciar &gt; Ligar/Desligar &gt; Reiniciar</strong>. Se a lentidão persistir após reiniciar, abra um chamado para a TI (<button onclick="openPop(\'POP-033\')" class="text-crimson font-bold underline">POP-033</button>).' }
+        ]
+      },
+      {
+        code: 'POP-031',
+        themeId: 5,
+        goal: 'Para recuperar o funcionamento do aplicativo',
+        title: 'Aplicativo parou de responder',
+        keywords: 'aplicativo parou de responder excel word travou fechou',
+        steps: [
+          { lead: 'Aguarde 30 segundos', text: 'Se o programa estiver salvando um arquivo grande ou gerando um relatório pesado, ele pode destravar sozinho em instantes.' },
+          { lead: 'Finalize apenas o programa congelado', text: 'Pressione <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd>, selecione o aplicativo marcado como <em>Não respondendo</em> e clique em <strong>Finalizar tarefa</strong> (<button onclick="openPop(\'POP-007\')" class="text-crimson font-bold underline">POP-007</button>).' },
+          { lead: 'Reabra e recupere o arquivo', text: 'Ao abrir o programa novamente (como Word ou Excel), verifique o painel lateral de <em>Recuperação de Documentos</em>.' }
+        ]
+      },
+      {
+        code: 'POP-032',
+        themeId: 5,
+        goal: 'Para realizar verificações iniciais de energia',
+        title: 'Notebook não liga',
+        keywords: 'nao liga tela preta morto bateria energia botao power',
+        steps: [
+          { lead: 'Teste a tomada e o LED do carregador', text: 'Conecte o carregador diretamente em outra tomada funcional (sem benjamins ou réguas com defeito) e confira se a luz indicadora de carga acende no notebook.' },
+          { lead: 'Remova todos os acessórios externos', text: 'Desconecte pendrives, mouses, cabos HDMI e hubs USB — um periférico em curto pode impedir a inicialização.' },
+          { lead: 'Faça a descarga residual', text: 'Com o carregador conectado, pressione e segure o botão <strong>Ligar/Desligar por 15 segundos</strong> seguidos, solte e aperte uma vez normalmente para ligar.' }
+        ]
+      },
+      {
+        code: 'POP-033',
+        themeId: 5,
+        goal: 'Para padronizar solicitações de suporte',
+        title: 'Como abrir um chamado de TI',
+        keywords: 'abrir chamado suporte ti ajuda ticket atendimento',
+        steps: [
+          { lead: 'Acesse o portal oficial de suporte', text: 'Entre na central de chamados da TI e escolha a categoria mais próxima do seu problema ou solicitação.' },
+          { lead: 'Preencha os dados essenciais do chamado', text: 'Informe o que você estava tentando fazer, qual sistema apresentou falha, a etiqueta de patrimônio do notebook e se o problema impede totalmente o seu trabalho.' }
+        ]
+      },
+      {
+        code: 'POP-034',
+        themeId: 5,
+        goal: 'Para agilizar o atendimento técnico',
+        title: 'Como coletar informações de um erro',
+        keywords: 'erro codigo print coletar evidencias mensagem falha',
+        steps: [
+          { lead: 'Tire um print completo da mensagem de erro', text: 'Use <kbd>Win</kbd> + <kbd>Shift</kbd> + <kbd>S</kbd> (<button onclick="openPop(\'POP-026\')" class="text-crimson font-bold underline">POP-026</button>) capturando tanto o aviso de erro quanto a janela do sistema ao fundo.' },
+          { lead: 'Anote o horário e anexe no chamado', text: 'Registre a hora aproximada em que o erro ocorreu e anexe a captura de tela diretamente na abertura do chamado de TI.' }
+        ]
+      },
+      {
+        code: 'POP-035',
+        themeId: 5,
+        goal: 'Para realizar recuperação segura',
+        title: 'O que fazer quando o notebook trava',
+        keywords: 'notebook travou congelou mouse nao mexe tela congelada',
+        steps: [
+          { lead: 'Tente destravar a tela com o atalho de vídeo', text: 'Se o cursor do mouse não se move ou a imagem congelou, pressione juntas as teclas <kbd>Win</kbd> + <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>B</kbd>. A tela piscará rapidamente enquanto o driver de vídeo reinicia sem fechar seus programas.' },
+          { lead: 'Tente acessar o menu de segurança', text: 'Pressione <kbd>Ctrl</kbd> + <kbd>Alt</kbd> + <kbd>Del</kbd> para tentar abrir o Gerenciador de Tarefas ou reiniciar o Windows.' },
+          { lead: 'Reinicialização forçada (apenas em último caso)', text: 'Se o equipamento continuar sem nenhuma resposta após 3 minutos, pressione e segure o botão <strong>Ligar/Desligar por 10 segundos</strong> até desligar por completo, aguarde 5 segundos e ligue novamente.' }
+        ]
+      },
+
+      // NOVOS POPS ADICIONADOS (POP-036 a POP-038)
+      {
+        code: 'POP-036',
+        themeId: 4,
+        goal: 'Para corrigir erros e falhas de sincronização no OneDrive',
+        title: 'Como resolver erros de sincronização no OneDrive',
+        keywords: 'onedrive erro sincronizacao nuvem x vermelho pausado sincronizar nao sincroniza',
+        steps: [
+          { lead: 'Verifique o ícone da nuvem na bandeja do sistema', text: 'Olhe perto do relógio do Windows (canto inferior direito) e clique no ícone do <strong>OneDrive</strong> para identificar se há um alerta de erro (<strong>X vermelho</strong>) ou sincronização pausada (traços paralelos).' },
+          { lead: 'Confira se a sincronização está pausada', text: 'Clique na nuvem do OneDrive, selecione o <strong>ícone de engrenagem (Ajuda e Configurações)</strong> e clique em <strong>Retomar sincronização</strong> caso esteja pausada.' },
+          { lead: 'Verifique caracteres inválidos ou nomes muito longos', text: 'Confira o nome do arquivo apontado no aviso de erro. Remova caracteres proibidos (<code class="inline-code">\\ / : * ? " &lt; &gt; |</code>) e evite nomes de arquivos ou subpastas excessivamente longos dentro das pastas sincronizadas.' },
+          { lead: 'Reinicie o aplicativo do OneDrive com segurança', text: 'Clique na <strong>engrenagem &gt; Fechar o OneDrive</strong>. Em seguida, pressione <kbd>Win</kbd> + <kbd>R</kbd>, digite <code class="inline-code">%localappdata%\\Microsoft\\OneDrive\\onedrive.exe</code> e pressione <kbd>Enter</kbd> para reabrir o serviço.' },
+          { lead: 'Desvincule e reconecte a conta (se o erro persistir)', text: 'Acesse <strong>Engrenagem &gt; Configurações &gt; Conta &gt; Desvincular este computador</strong> e faça login novamente com seu e-mail corporativo. Seus arquivos já baixados não são apagados nesse processo.' }
+        ]
+      },
+      {
+        code: 'POP-037',
+        themeId: 1,
+        goal: 'Para resolver lentidão causada pelo OneDrive e serviços em nuvem',
+        title: 'Como corrigir lentidão no OneDrive e serviços relacionados',
+        keywords: 'onedrive lento lentidao nuvem banda internet travando webview2 arquivos sob demanda',
+        steps: [
+          { lead: 'Ative os Arquivos Sob Demanda (Files On-Demand)', text: 'Clique na nuvem do OneDrive &gt; <strong>Engrenagem &gt; Configurações &gt; Sincronização e backup &gt; Configurações avançadas</strong> e deixe ativada a opção <strong>Arquivos Sob Demanda</strong>, evitando que todos os arquivos da nuvem ocupem disco e internet continuamente.' },
+          { lead: 'Libere espaço de pastas pesadas já baixadas', text: 'Abra o Explorador de Arquivos (<kbd>Win</kbd> + <kbd>E</kbd>), clique com o botão direito sobre pastas antigas ou pesadas no OneDrive e selecione <strong>Liberar espaço</strong> para mantê-las apenas na nuvem (ícone de nuvem azul).' },
+          { lead: 'Limite a taxa de upload e download', text: 'Se a sincronização estiver consumindo toda a banda e deixando sistemas web lentos, abra <strong>Configurações &gt; Sincronização e backup &gt; Limitar taxa de download/upload</strong> e defina um limite automático ou fixo.' },
+          { lead: 'Pause temporariamente durante reuniões ou envios críticos', text: 'Clique na <strong>engrenagem &gt; Pausar sincronização &gt; 2 horas</strong> sempre que estiver em chamadas de vídeo importantes ou enviando arquivos urgentes.' },
+          { lead: 'Verifique processos do OneDrive no Gerenciador de Tarefas', text: 'Pressione <kbd>Ctrl</kbd> + <kbd>Shift</kbd> + <kbd>Esc</kbd> (<button onclick="openPop(\'POP-002\')" class="text-crimson font-bold underline">POP-002</button>) e observe se <em>Microsoft OneDrive</em> ou <em>Microsoft Edge WebView2</em> estão com uso elevado de disco/rede; caso estejam travados, reinicie o cliente conforme o <button onclick="openPop(\'POP-036\')" class="text-crimson font-bold underline">POP-036</button>.' }
+        ]
+      },
+      {
+        code: 'POP-038',
+        themeId: 4,
+        goal: 'Para corrigir erro de escala e imagem distorcida no monitor externo',
+        title: 'Como corrigir erro de escala ajustando resolução e taxa de atualização (abaixo de 59Hz)',
+        keywords: 'monitor escala erro de escala resolucao taxa de atualizacao 59hz 50hz hz imagem distorcida tela cortada',
+        steps: [
+          { lead: 'Abra as Configurações de exibição do Windows', text: 'Clique com o botão direito em uma área vazia da Área de Trabalho e selecione <strong>Configurações de exibição</strong> (ou pressione <kbd>Win</kbd> + <kbd>I</kbd> e acesse <strong>Sistema &gt; Tela</strong>).' },
+          { lead: 'Selecione o monitor afetado no diagrama superior', text: 'Clique sobre o retângulo correspondente ao monitor externo com erro de escala (<strong>Monitor 1</strong> ou <strong>Monitor 2</strong>) para garantir que os ajustes sejam aplicados na tela correta.' },
+          { lead: 'Reduza a Resolução da tela', text: 'Na seção <strong>Escala e layout</strong>, abra o menu suspenso <strong>Resolução de tela</strong>, selecione um padrão compatível imediatamente inferior (por exemplo, de <em>1920 × 1080</em> para <em>1600 × 900</em> ou <em>1366 × 768</em>) e clique em <strong>Manter alterações</strong>.' },
+          { lead: 'Acesse a Exibição avançada', text: 'Role a janela de Configurações de Tela até o final e clique em <strong>Exibição avançada</strong> (ou <em>Configurações avançadas de tela</em>).' },
+          { lead: 'Defina obrigatoriamente a Taxa de atualização abaixo de 59Hz', text: 'No campo <strong>Escolher uma taxa de atualização</strong>, abra o menu e selecione <strong>50 Hz</strong> (ou a opção disponível abaixo de 59Hz, como <em>50,00 Hz</em>). Clique em <strong>Manter alterações</strong> para estabilizar a escala e eliminar cortes ou distorções na imagem.' }
+        ]
+      }
+    ];
+
+    // 4. ÁRVORE DE DECISÃO DA TRIAGEM INTELIGENTE
+    const TRIAGE_NODES = {
+      start: {
+        question: 'O que está acontecendo ou o que você precisa fazer agora?',
+        subtitle: 'Escolha a opção que melhor descreve sua situação atual para irmos direto ao procedimento certo.',
+        options: [
+          {
+            label: 'Meu notebook, OneDrive ou sistema está lento ou travando',
+            desc: 'Demora para ligar, lentidão no OneDrive/nuvem, programas congelando ou disco cheio.',
+            next: 'slow_branch'
+          },
+          {
+            label: 'Estou com erro no OneDrive, monitor externo, Wi-Fi ou áudio',
+            desc: 'Falha de sincronização no OneDrive, erro de escala no monitor (Hz/resolução), rede ou som.',
+            next: 'hardware_conn_branch'
+          },
+          {
+            label: 'Recebi algo suspeito ou preciso proteger meus dados',
+            desc: 'E-mail estranho, suspeita de vírus, uso de pendrive, senhas ou Wi-Fi externo.',
+            next: 'security_branch'
+          },
+          {
+            label: 'Quero organizar meu trabalho, telas ou limpar o equipamento',
+            desc: 'Segundo monitor, atalhos, pastas, limpeza de tela/teclado ou cuidados físicos.',
+            next: 'productivity_care_branch'
+          },
+          {
+            label: 'Preciso registrar um erro e abrir chamado para a TI',
+            desc: 'Já tentei resolver ou preciso encaminhar evidências para atendimento técnico.',
+            pops: ['POP-034', 'POP-033', 'POP-026'],
+            summary: 'Para agilizar o atendimento da TI, colete o print completo do erro e abra o chamado com os dados do equipamento.'
+          }
+        ]
+      },
+
+      // RAMO 1: LENTIDÃO E TRAVAMENTO
+      slow_branch: {
+        question: 'Como essa lentidão ou travamento está acontecendo?',
+        subtitle: 'Selecione o comportamento mais parecido com o que você vê na tela.',
+        options: [
+          {
+            label: 'Lentidão causada pelo OneDrive ou serviços em nuvem',
+            desc: 'Sincronização pesada consumindo internet/disco e deixando o sistema devagar.',
+            pops: ['POP-037', 'POP-036', 'POP-030'],
+            summary: 'Ative os Arquivos Sob Demanda, libere espaço de pastas pesadas e pause ou limite a banda do OneDrive.'
+          },
+          {
+            label: 'O notebook demora muito logo ao ligar',
+            desc: 'Vários programas abrem sozinhos e travam o início do expediente.',
+            pops: ['POP-003', 'POP-005'],
+            summary: 'Desabilitar aplicativos desnecessários na inicialização reduz drasticamente o tempo até o Windows ficar pronto.'
+          },
+          {
+            label: 'Está lento durante o uso geral no dia a dia',
+            desc: 'Tudo demora para abrir, mas o mouse e as janelas ainda respondem.',
+            pops: ['POP-030', 'POP-002', 'POP-004', 'POP-005'],
+            summary: 'Execute o checklist rápido de desempenho, identifique os programas pesados e reinicie o Windows corretamente.'
+          },
+          {
+            label: 'O Disco C: está cheio ou com pouco espaço livre',
+            desc: 'Preciso liberar armazenamento com segurança sem apagar meus arquivos.',
+            pops: ['POP-001', 'POP-006'],
+            summary: 'Verifique o percentual livre no SSD e remova arquivos temporários mantendo a pasta Downloads desmarcada.'
+          },
+          {
+            label: 'Apenas um aplicativo (ex.: Excel, navegador) congelou',
+            desc: 'O restante do Windows funciona, mas um programa está "Não respondendo".',
+            pops: ['POP-031', 'POP-007'],
+            summary: 'Use o Gerenciador de Tarefas para encerrar apenas o programa travado sem perder o restante do trabalho.'
+          },
+          {
+            label: 'A tela inteira congelou e nem o mouse se mexe',
+            desc: 'O sistema parou completamente de responder.',
+            pops: ['POP-035', 'POP-005'],
+            summary: 'Tente reiniciar o driver de vídeo (Win + Ctrl + Shift + B) antes de recorrer ao desligamento forçado.'
+          }
+        ]
+      },
+
+      // RAMO 2: ONEDRIVE, MONITOR, CONEXÃO, REUNIÕES E ENERGIA
+      hardware_conn_branch: {
+        question: 'Qual falha técnica você está enfrentando?',
+        subtitle: 'Escolha o item afetado para abrir o roteiro de verificação.',
+        options: [
+          {
+            label: 'Erro de sincronização no OneDrive (X vermelho ou pausado)',
+            desc: 'Arquivos não sobem para a nuvem ou o OneDrive exibe alerta de erro.',
+            pops: ['POP-036', 'POP-028'],
+            summary: 'Verifique se a sincronização está pausada, corrija caracteres inválidos ou reinicie/reconecte o cliente do OneDrive.'
+          },
+          {
+            label: 'Monitor externo com erro de escala, tela cortada ou distorcida',
+            desc: 'Imagem desproporcional que precisa reduzir resolução e taxa de atualização abaixo de 59Hz.',
+            pops: ['POP-038', 'POP-025'],
+            summary: 'Reduza a resolução do monitor afetado e altere obrigatoriamente a taxa de atualização para 50 Hz (abaixo de 59Hz).'
+          },
+          {
+            label: 'O notebook não conecta ao Wi-Fi ou está sem internet',
+            desc: 'Rede não aparece, pede senha novamente ou fica sem acesso.',
+            pops: ['POP-029', 'POP-005'],
+            summary: 'Siga o diagnóstico inicial de Wi-Fi e Modo Avião antes de acionar o suporte.'
+          },
+          {
+            label: 'Estou sem áudio ou meu microfone não funciona na reunião',
+            desc: 'Ninguém me ouve no Teams/Zoom ou não escuto os participantes.',
+            pops: ['POP-027'],
+            summary: 'Ajuste os dispositivos de entrada e saída tanto no Windows quanto nas configurações da reunião.'
+          },
+          {
+            label: 'O notebook não liga ou está superaquecendo',
+            desc: 'Aparelho sem sinal de energia ao apertar ligar ou ventoinha muito quente.',
+            pops: ['POP-032', 'POP-014', 'POP-013'],
+            summary: 'Realize as verificações de carregador, descarga residual de 15 segundos e desobstrução das saídas de ar.'
+          }
+        ]
+      },
+
+      // RAMO 3: SEGURANÇA DIGITAL
+      security_branch: {
+        question: 'Qual assunto de segurança digital você precisa consultar?',
+        subtitle: 'Selecione o cenário correspondente.',
+        options: [
+          {
+            label: 'Recebi um e-mail suspeito ou cliquei em algo estranho',
+            desc: 'Quero validar se é phishing ou suspeito que o notebook pegou vírus.',
+            pops: ['POP-016', 'POP-020'],
+            summary: 'Se já clicou ou baixou algo suspeito, desconecte a internet imediatamente e siga o protocolo de incidente.'
+          },
+          {
+            label: 'Vou trabalhar fora do escritório (hotel, aeroporto, café)',
+            desc: 'Preciso conectar em redes Wi-Fi externas com segurança.',
+            pops: ['POP-021', 'POP-015'],
+            summary: 'Prefira rotear o 4G/5G do celular ou conecte obrigatoriamente a VPN corporativa.'
+          },
+          {
+            label: 'Quero proteger minhas senhas, arquivos ou usar pendrive',
+            desc: 'Boas práticas de senha, bloqueio de tela, backup e dispositivos USB.',
+            pops: ['POP-017', 'POP-015', 'POP-018', 'POP-019'],
+            summary: 'Confira os padrões corporativos de senhas, bloqueio rápido (Win + L) e armazenamento seguro.'
+          }
+        ]
+      },
+
+      // RAMO 4: PRODUTIVIDADE E CONSERVAÇÃO FÍSICA
+      productivity_care_branch: {
+        question: 'O que você gostaria de configurar ou cuidar hoje?',
+        subtitle: 'Escolha entre recursos de produtividade no Windows ou conservação física do notebook.',
+        options: [
+          {
+            label: 'Configurar monitor externo, corrigir escala ou dividir janelas',
+            desc: 'Estender telas, ajustar resolução/taxa abaixo de 59Hz e organizar janelas lado a lado.',
+            pops: ['POP-025', 'POP-038', 'POP-024', 'POP-022'],
+            summary: 'Configure o modo Estender (Win + P), ajuste a escala/Hz se necessário e organize suas janelas.'
+          },
+          {
+            label: 'Usar o OneDrive, resolver sincronização e organizar pastas',
+            desc: 'Corrigir falhas de sincronização, aliviar lentidão na nuvem e padronizar documentos.',
+            pops: ['POP-028', 'POP-036', 'POP-037', 'POP-023'],
+            summary: 'Verifique o status da nuvem do OneDrive, ative Arquivos Sob Demanda e mantenha seus arquivos nos repositórios oficiais.'
+          },
+          {
+            label: 'Tirar print da tela ou aprender atalhos rápidos',
+            desc: 'Capturar telas para enviar por e-mail/Teams e ganhar agilidade.',
+            pops: ['POP-026', 'POP-022'],
+            summary: 'Use Win + Shift + S para recortar qualquer área da tela e colar diretamente nas mensagens.'
+          },
+          {
+            label: 'Limpar tela/teclado, cuidar da bateria ou transportar o notebook',
+            desc: 'Evitar riscos no display, desgaste de bateria e danos na mochila.',
+            pops: ['POP-009', 'POP-010', 'POP-011', 'POP-012', 'POP-013'],
+            summary: 'Siga os cuidados físicos recomendados para preservar a vida útil do seu notebook.'
+          }
+        ]
+      }
+    };
+
+    // 5. ESTADO DA APLICAÇÃO
+    let state = {
+      mode: 'triage',          // 'triage' | 'catalog' | 'detail'
+      previousMode: 'triage',  // para botão Voltar no detalhe
+      selectedTheme: 'all',
+      searchQuery: '',
+      currentPopCode: null,
+      triageHistory: ['start'] // pilha de navegação da triagem
+    };
+
+    // 6. FUNÇÕES DE NAVEGAÇÃO E RENDERIZAÇÃO
+    function switchMode(newMode) {
+      state.mode = newMode;
+
+      const triageView = document.getElementById('triageView');
+      const catalogView = document.getElementById('catalogView');
+      const detailView = document.getElementById('detailView');
+      const heroBanner = document.getElementById('heroBanner');
+
+      const navTriageBtn = document.getElementById('navTriageBtn');
+      const navCatalogBtn = document.getElementById('navCatalogBtn');
+
+      triageView.classList.add('hidden');
+      catalogView.classList.add('hidden');
+      detailView.classList.add('hidden');
+
+      if (newMode === 'triage') {
+        triageView.classList.remove('hidden');
+        heroBanner.classList.remove('hidden');
+        navTriageBtn.className = 'flex-1 sm:flex-none px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition bg-white text-crimson shadow-sm';
+        navCatalogBtn.className = 'flex-1 sm:flex-none px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition text-white/85 hover:text-white';
+        renderTriage();
+      } else if (newMode === 'catalog') {
+        catalogView.classList.remove('hidden');
+        heroBanner.classList.remove('hidden');
+        navCatalogBtn.className = 'flex-1 sm:flex-none px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition bg-white text-crimson shadow-sm';
+        navTriageBtn.className = 'flex-1 sm:flex-none px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition text-white/85 hover:text-white';
+        renderCatalog();
+      } else if (newMode === 'detail') {
+        detailView.classList.remove('hidden');
+        heroBanner.classList.add('hidden');
+        navTriageBtn.className = 'flex-1 sm:flex-none px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition text-white/85 hover:text-white';
+        navCatalogBtn.className = 'flex-1 sm:flex-none px-3.5 py-1.5 rounded-md text-xs sm:text-sm font-bold transition text-white/85 hover:text-white';
+        renderDetail();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function resetHome() {
+      clearSearch(false);
+      state.triageHistory = ['start'];
+      switchMode('triage');
+    }
+
+    function handleSearch(query) {
+      state.searchQuery = query.trim();
+      const clearBtn = document.getElementById('clearSearchBtn');
+      if (state.searchQuery.length > 0) {
+        clearBtn.classList.remove('hidden');
+        state.selectedTheme = 'all';
+        if (state.mode !== 'catalog') {
+          switchMode('catalog');
+        } else {
+          renderCatalog();
+        }
+      } else {
+        clearBtn.classList.add('hidden');
+        if (state.mode === 'catalog') {
+          renderCatalog();
+        }
+      }
+    }
+
+    function clearSearch(rerender = true) {
+      const input = document.getElementById('globalSearch');
+      input.value = '';
+      state.searchQuery = '';
+      document.getElementById('clearSearchBtn').classList.add('hidden');
+      if (rerender && state.mode === 'catalog') {
+        renderCatalog();
+      }
+    }
+
+    // 7. RENDERIZAÇÃO DA TRIAGEM INTELIGENTE
+    function renderTriage() {
+      const currentNodeKey = state.triageHistory[state.triageHistory.length - 1];
+      const node = TRIAGE_NODES[currentNodeKey];
+      const stepNumber = state.triageHistory.length;
+
+      const stepBadge = document.getElementById('triageStepBadge');
+      const backBtn = document.getElementById('triageBackBtn');
+      const restartBtn = document.getElementById('triageRestartBtn');
+      const bodyEl = document.getElementById('triageBody');
+
+      if (stepNumber > 1) {
+        backBtn.classList.remove('hidden');
+        restartBtn.classList.remove('hidden');
+      } else {
+        backBtn.classList.add('hidden');
+        restartBtn.classList.add('hidden');
+      }
+
+      // Se o nó atual já é um resultado final com POPs recomendados
+      if (node.pops) {
+        stepBadge.textContent = 'Diagnóstico Concluído';
+        const recommendedPops = node.pops.map(code => POPS.find(p => p.code === code)).filter(Boolean);
+
+        bodyEl.innerHTML = `
+          <div class="fade-in">
+            <div class="bg-crimson-light border border-crimson-border rounded-xl p-4 sm:p-5 mb-6">
+              <div class="text-xs font-extrabold uppercase tracking-wider text-crimson mb-1">
+                Procedimento(s) Recomendado(s) para o seu caso
+              </div>
+              <p class="text-sm sm:text-base text-stoneink font-medium">
+                ${node.summary}
+              </p>
+            </div>
+
+            <div class="space-y-3">
+              ${recommendedPops.map((pop, idx) => {
+                const theme = THEMES.find(t => t.id === pop.themeId);
+                return `
+                  <button onclick="openPop('${pop.code}')" class="w-full text-left bg-white hover:bg-rose-50/40 border-2 ${idx === 0 ? 'border-crimson' : 'border-stone-200 hover:border-crimson'} rounded-xl p-4 sm:p-5 transition shadow-sm group flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <div class="flex flex-wrap items-center gap-2 mb-1.5">
+                        ${idx === 0 ? '<span class="bg-crimson text-white text-[11px] font-extrabold uppercase tracking-wider px-2.5 py-0.5 rounded">Mais indicado</span>' : ''}
+                        <span class="text-xs font-extrabold uppercase tracking-wide text-crimson">${pop.goal}</span>
+                      </div>
+                      <div class="flex flex-wrap items-center gap-2.5">
+                        <span class="bg-crimson-light text-crimson border border-crimson-border text-xs font-extrabold px-2.5 py-0.5 rounded">${pop.code}</span>
+                        <span class="text-base sm:text-lg font-extrabold text-stoneink group-hover:text-crimson transition">${pop.title}</span>
+                      </div>
+                      <div class="text-xs text-stone-500 mt-1.5 font-medium">Tema ${theme.num} • ${theme.name}</div>
+                    </div>
+                    <div class="shrink-0">
+                      <span class="inline-flex items-center gap-1.5 bg-crimson text-white text-xs sm:text-sm font-bold px-4 py-2.5 rounded-lg group-hover:bg-crimson-dark transition">
+                        Abrir Passo a Passo →
+                      </span>
+                    </div>
+                  </button>
+                `;
+              }).join('')}
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      // Caso contrário, exibe a pergunta atual da triagem
+      stepBadge.textContent = `Etapa ${stepNumber} de 2`;
+      bodyEl.innerHTML = `
+        <div class="fade-in">
+          <h3 class="text-xl sm:text-2xl font-extrabold text-stoneink leading-snug">
+            ${node.question}
+          </h3>
+          <p class="text-sm text-stone-500 mt-1.5 mb-6">
+            ${node.subtitle}
+          </p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+            ${node.options.map((opt, index) => `
+              <button onclick="selectTriageOption(${index})" class="text-left bg-cream/60 hover:bg-white border border-stone-200 hover:border-crimson rounded-xl p-4 sm:p-5 transition shadow-sm hover:shadow group flex flex-col justify-between">
+                <div>
+                  <div class="flex items-start justify-between gap-2">
+                    <span class="text-base font-extrabold text-stoneink group-hover:text-crimson transition leading-snug">
+                      ${opt.label}
+                    </span>
+                    <span class="text-crimson font-extrabold text-lg leading-none opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition">→</span>
+                  </div>
+                  <p class="text-xs sm:text-sm text-stone-600 mt-2 leading-relaxed">
+                    ${opt.desc}
+                  </p>
+                </div>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function selectTriageOption(optionIndex) {
+      const currentNodeKey = state.triageHistory[state.triageHistory.length - 1];
+      const currentNode = TRIAGE_NODES[currentNodeKey];
+      const chosen = currentNode.options[optionIndex];
+
+      if (chosen.next) {
+        state.triageHistory.push(chosen.next);
+        renderTriage();
+      } else if (chosen.pops) {
+        // Cria um nó virtual de resultado no histórico
+        const resultKey = `${currentNodeKey}_res_${optionIndex}`;
+        TRIAGE_NODES[resultKey] = {
+          pops: chosen.pops,
+          summary: chosen.summary
+        };
+        state.triageHistory.push(resultKey);
+        renderTriage();
+      }
+    }
+
+    function goBackTriage() {
+      if (state.triageHistory.length > 1) {
+        state.triageHistory.pop();
+        renderTriage();
+      }
+    }
+
+    function restartTriage() {
+      state.triageHistory = ['start'];
+      renderTriage();
+    }
+
+    // 8. RENDERIZAÇÃO DO CATÁLOGO CLICÁVEL POR TEMAS (COM ORDEM INVERTIDA)
+    function selectTheme(themeId) {
+      state.selectedTheme = themeId;
+      renderCatalog();
+    }
+
+    function renderCatalog() {
+      const tabsEl = document.getElementById('themeTabs');
+      const bannerEl = document.getElementById('themeBanner');
+      const gridEl = document.getElementById('popCardsGrid');
+      const emptyEl = document.getElementById('emptySearchState');
+      const counterEl = document.getElementById('catalogCounter');
+
+      // Renderizar abas de tema
+      tabsEl.innerHTML = THEMES.map(t => {
+        const active = state.selectedTheme === t.id;
+        return `
+          <button onclick="selectTheme(${typeof t.id === 'string' ? `'${t.id}'` : t.id})"
+            class="px-3.5 py-2 rounded-lg text-xs sm:text-sm font-bold border transition ${
+              active
+                ? 'bg-crimson text-white border-crimson shadow-sm'
+                : 'bg-white text-stone-700 border-stone-200 hover:border-crimson hover:text-crimson'
+            }">
+            ${t.id === 'all' ? t.name : `${t.num}. ${t.name}`}
+          </button>
+        `;
+      }).join('');
+
+      // Banner do tema ativo
+      const activeTheme = THEMES.find(t => t.id === state.selectedTheme) || THEMES[0];
+      bannerEl.innerHTML = `
+        <div class="text-xs font-extrabold uppercase tracking-wider text-crimson mb-1">
+          ${activeTheme.id === 'all' ? 'Catálogo Completo' : `Tema ${activeTheme.num}`}
+        </div>
+        <h2 class="text-lg sm:text-xl font-extrabold text-stoneink">${activeTheme.name}</h2>
+        <p class="text-xs sm:text-sm text-stone-600 mt-1">${activeTheme.desc}</p>
+      `;
+
+      // Filtrar POPs por tema e busca
+      const q = state.searchQuery.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const filtered = POPS.filter(pop => {
+        const matchTheme = state.selectedTheme === 'all' || pop.themeId === state.selectedTheme;
+        if (!matchTheme) return false;
+        if (!q) return true;
+
+        const haystack = `${pop.code} ${pop.goal} ${pop.title} ${pop.keywords}`
+          .toLowerCase()
+          .normalize('NFD')
+          .replace(/[\u0300-\u036f]/g, '');
+        return haystack.includes(q);
+      });
+
+      counterEl.textContent = `${filtered.length} ${filtered.length === 1 ? 'procedimento' : 'procedimentos'}`;
+
+      if (filtered.length === 0) {
+        gridEl.innerHTML = '';
+        emptyEl.classList.remove('hidden');
+        return;
+      }
+
+      emptyEl.classList.add('hidden');
+
+      // Renderizar Cards com ORDEM INVERTIDA (Necessidade primeiro -> POP-XXX -> Título)
+      gridEl.innerHTML = filtered.map(pop => {
+        const theme = THEMES.find(t => t.id === pop.themeId);
+        return `
+          <button onclick="openPop('${pop.code}')" class="text-left bg-white hover:bg-rose-50/30 border border-stone-200 hover:border-crimson rounded-xl p-4 sm:p-5 transition shadow-sm hover:shadow group flex flex-col justify-between">
+            <div>
+              <!-- 1º: Objetivo / Necessidade em destaque -->
+              <div class="text-xs font-extrabold uppercase tracking-wide text-crimson mb-2">
+                ${pop.goal}
+              </div>
+
+              <!-- 2º e 3º: Selo POP-XXX + Título do procedimento -->
+              <div class="flex items-start gap-2.5">
+                <span class="shrink-0 bg-crimson text-white text-xs font-extrabold px-2.5 py-1 rounded mt-0.5">
+                  ${pop.code}
+                </span>
+                <h3 class="text-base font-extrabold text-stoneink group-hover:text-crimson transition leading-snug">
+                  ${pop.title}
+                </h3>
+              </div>
+            </div>
+
+            <div class="mt-4 pt-3 border-t border-stone-100 flex items-center justify-between text-xs text-stone-500">
+              <span class="font-medium">Tema ${theme.num} • ${theme.name}</span>
+              <span class="font-bold text-crimson group-hover:translate-x-0.5 transition">Ver passos →</span>
+            </div>
+          </button>
+        `;
+      }).join('');
+    }
+
+    // 9. VISUALIZAÇÃO COMPLETA DO POP (SEM FORMATO DE LISTA, COM TELAS ILUSTRATIVAS)
+    function openPop(code) {
+      if (state.mode !== 'detail') {
+        state.previousMode = state.mode;
+      }
+      state.currentPopCode = code;
+      switchMode('detail');
+    }
+
+    function backFromDetail() {
+      switchMode(state.previousMode || 'catalog');
+    }
+
+    function renderDetail() {
+      const popIndex = POPS.findIndex(p => p.code === state.currentPopCode);
+      const pop = POPS[popIndex];
+      if (!pop) return;
+
+      const theme = THEMES.find(t => t.id === pop.themeId);
+      const crumbEl = document.getElementById('detailThemeCrumb');
+      const cardEl = document.getElementById('detailCard');
+      const prevNextEl = document.getElementById('detailPrevNext');
+
+      crumbEl.textContent = `Tema ${theme.num} • ${theme.name}`;
+
+      const mockupHtml = MOCKUPS[pop.code] || '';
+
+      // Renderiza cabeçalho invertido + blocos editoriais sem lista
+      cardEl.innerHTML = `
+        <div class="bg-stone-50 border-b border-stone-200 px-5 sm:px-8 py-6">
+          <div class="text-xs sm:text-sm font-extrabold uppercase tracking-wider text-crimson mb-2">
+            ${pop.goal}
+          </div>
+          <div class="flex flex-wrap items-center gap-3">
+            <span class="bg-crimson text-white text-sm font-extrabold px-3 py-1 rounded-md shadow-sm">
+              ${pop.code}
+            </span>
+            <h1 class="text-xl sm:text-2xl lg:text-3xl font-extrabold text-stoneink tracking-tight">
+              ${pop.title}
+            </h1>
+          </div>
+        </div>
+
+        <div class="p-5 sm:p-8">
+          <div class="divide-y divide-dashed divide-stone-200">
+            ${pop.steps.map((step, i) => `
+              <div class="${i === 0 ? 'pb-5' : i === pop.steps.length - 1 ? 'pt-5' : 'py-5'}">
+                <div class="flex items-baseline gap-2.5 mb-1.5">
+                  <span class="text-xs font-extrabold uppercase tracking-wider text-crimson bg-crimson-light border border-crimson-border px-2 py-0.5 rounded">
+                    Passo ${i + 1}
+                  </span>
+                  <h2 class="text-base sm:text-lg font-extrabold text-stoneink">
+                    ${step.lead}
+                  </h2>
+                </div>
+                <p class="text-sm sm:text-base text-stone-700 leading-relaxed">
+                  ${step.text}
+                </p>
+              </div>
+            `).join('')}
+          </div>
+
+          ${mockupHtml}
+        </div>
+      `;
+
+      // Navegação Anterior / Próximo
+      const prevPop = popIndex > 0 ? POPS[popIndex - 1] : null;
+      const nextPop = popIndex < POPS.length - 1 ? POPS[popIndex + 1] : null;
+
+      prevNextEl.innerHTML = `
+        <div>
+          ${prevPop ? `
+            <button onclick="openPop('${prevPop.code}')" class="w-full text-left bg-white hover:bg-stone-50 border border-stone-200 hover:border-crimson rounded-xl p-4 transition shadow-sm">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-stone-400">← Procedimento anterior</div>
+              <div class="text-xs font-extrabold text-crimson mt-1">${prevPop.goal}</div>
+              <div class="text-sm font-bold text-stoneink mt-0.5">${prevPop.code} — ${prevPop.title}</div>
+            </button>
+          ` : ''}
+        </div>
+        <div>
+          ${nextPop ? `
+            <button onclick="openPop('${nextPop.code}')" class="w-full text-right bg-white hover:bg-stone-50 border border-stone-200 hover:border-crimson rounded-xl p-4 transition shadow-sm">
+              <div class="text-[11px] font-bold uppercase tracking-wider text-stone-400">Próximo procedimento →</div>
+              <div class="text-xs font-extrabold text-crimson mt-1">${nextPop.goal}</div>
+              <div class="text-sm font-bold text-stoneink mt-0.5">${nextPop.code} — ${nextPop.title}</div>
+            </button>
+          ` : ''}
+        </div>
+      `;
+    }
+
+    // Inicializar na Triagem Inteligente
+    window.addEventListener('DOMContentLoaded', () => {
+      renderTriage();
+    });
+  </script>
+</body>
+</html>
