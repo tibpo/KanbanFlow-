@@ -27,10 +27,27 @@ export const ui = {
    */
   render(state) {
     this.renderTheme(state.theme);
+    this.renderFilters(state);
     this.renderProjects(state);
     this.renderActiveProjectHeader(state);
     this.renderColumnsAndCards(state);
     this.renderMetrics(state);
+  },
+
+  /**
+   * Mantém os controles de filtro da barra superior sincronizados com o estado,
+   * inclusive quando o filtro é alterado pela landing page.
+   */
+  renderFilters(state) {
+    const prioritySelect = document.getElementById('priorityFilter');
+    if (prioritySelect && prioritySelect.value !== state.priorityFilter) {
+      prioritySelect.value = state.priorityFilter;
+    }
+
+    const searchInput = document.getElementById('searchInput');
+    if (searchInput && state.searchQuery && searchInput.value.trim().toLowerCase() !== state.searchQuery) {
+      searchInput.value = state.searchQuery;
+    }
   },
 
   /**

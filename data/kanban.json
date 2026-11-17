@@ -17,6 +17,30 @@
       "name": "DevOps & Infraestrutura",
       "description": "Containerização com Docker e pipeline automatizado de CI/CD.",
       "color": "#f59e0b"
+    },
+    {
+      "id": "proj_1794915200316",
+      "name": "dale fon",
+      "description": "dale dale lol 2",
+      "color": "#ef4444"
+    },
+    {
+      "id": "proj_1794915212285",
+      "name": "da",
+      "description": "fa",
+      "color": "#ec4899"
+    },
+    {
+      "id": "proj_1794915216651",
+      "name": "asfa",
+      "description": "",
+      "color": "#ef4444"
+    },
+    {
+      "id": "proj_1794915223392",
+      "name": "sfvsafsfdsaa",
+      "description": "",
+      "color": "#8b5cf6"
     }
   ],
   "tasks": [
@@ -40,7 +64,7 @@
     {
       "id": "task_2",
       "projectId": "proj_ecommerce",
-      "columnId": "in_progress",
+      "columnId": "done",
       "title": "Configurar cache de sessões com Redis",
       "description": "Implementar cluster Redis para gerenciar carrinhos ativos e sessões com alta disponibilidade.",
       "priority": "medium",
@@ -51,7 +75,7 @@
         "redis",
         "cache"
       ],
-      "order": 0,
+      "order": 1,
       "createdAt": "2026-11-11T14:30:00Z"
     },
     {
@@ -68,7 +92,7 @@
         "busca",
         "api"
       ],
-      "order": 1,
+      "order": 0,
       "createdAt": "2026-11-12T09:15:00Z"
     },
     {

@@ -304,6 +304,19 @@
 
   <!-- Landing Page / Apresentação Showcase (Motion Frame & LEDs) -->
   <div class="landing-overlay" id="landingOverlay" hidden>
+    <!-- Ambiente 3D imersivo de universo (canvas + nebulosas em degradê) -->
+    <div class="landing-universe" aria-hidden="true">
+      <canvas id="universeCanvas"></canvas>
+      <div class="universe-nebula nebula-blue"></div>
+      <div class="universe-nebula nebula-purple"></div>
+      <div class="universe-nebula nebula-red"></div>
+      <div class="universe-vignette"></div>
+    </div>
+
+    <!-- LEDs laterais em degradê azul → roxo → vermelho -->
+    <div class="led-rail led-rail-left" id="ledRailLeft" aria-hidden="true"></div>
+    <div class="led-rail led-rail-right" id="ledRailRight" aria-hidden="true"></div>
+
     <header class="landing-header">
       <div class="landing-brand">
         <span style="font-size: 1.5rem;">📋</span>
@@ -320,51 +333,77 @@
       </div>
 
       <!-- Painel de LEDs Multicoloridos -->
-      <div class="led-dashboard-strip" title="Clique nos LEDs para testar o brilho">
-        <div class="led-item" title="Servidor & Conexão SSE">
+      <div class="led-dashboard-strip" title="Clique em um módulo para inspecionar seu diretório local">
+        <div class="led-item" data-mod="servidor" data-directory="modulos/servidor/index.html" role="button" tabindex="0" title="Ir para a seção Servidor na landing (Ctrl+Clique abre a pasta local)">
           <span class="led-lamp led-green"></span>
           <span class="led-label">Servidor</span>
         </div>
-        <div class="led-item" title="Sincronização em Nuvem">
+        <div class="led-item" data-mod="nuvem" data-directory="modulos/nuvem/index.html" role="button" tabindex="0" title="Ir para a seção Nuvem na landing (Ctrl+Clique abre a pasta local)">
           <span class="led-lamp led-cyan"></span>
           <span class="led-label">Nuvem</span>
         </div>
-        <div class="led-item" title="Motor de Movimento">
+        <div class="led-item" data-mod="motion" data-directory="modulos/motion/index.html" role="button" tabindex="0" title="Ir para a seção Motion na landing (Ctrl+Clique abre a pasta local)">
           <span class="led-lamp led-purple"></span>
           <span class="led-label">Motion</span>
         </div>
-        <div class="led-item" title="Fila de Tarefas Ativas">
+        <div class="led-item" data-mod="fila" data-directory="modulos/fila/index.html" role="button" tabindex="0" title="Ir para a seção Fila na landing (Ctrl+Clique abre a pasta local)">
           <span class="led-lamp led-amber"></span>
           <span class="led-label">Fila</span>
         </div>
-        <div class="led-item" title="Prioridade Alta & Auditoria">
+        <div class="led-item" data-mod="urgente" data-directory="modulos/urgente/index.html" role="button" tabindex="0" title="Ir para a seção Urgente na landing (Ctrl+Clique abre a pasta local)">
           <span class="led-lamp led-red"></span>
           <span class="led-label">Urgente</span>
         </div>
-        <div class="led-item" title="Interface Reativa">
+        <div class="led-item" data-mod="reativo" data-directory="modulos/reativo/index.html" role="button" tabindex="0" title="Ir para a seção Reativo na landing (Ctrl+Clique abre a pasta local)">
           <span class="led-lamp led-pink"></span>
           <span class="led-label">Reativo</span>
         </div>
       </div>
 
-      <!-- Seletor Circular com Motion Frame -->
-      <div class="circular-stage">
-        <!-- Anéis com animação de movimento -->
-        <div class="motion-frame-outer"></div>
-        <div class="motion-frame-middle"></div>
-        <div class="motion-frame-inner"></div>
+      <!-- Deck principal: seletor orbital + telemetria lado a lado (sem rolagem ao clicar) -->
+      <div class="landing-command-deck">
+        <!-- Seletor Circular com Motion Frame -->
+        <div class="circular-stage">
+          <!-- Anéis com animação de movimento -->
+          <div class="motion-frame-outer"></div>
+          <div class="motion-frame-middle"></div>
+          <div class="motion-frame-inner"></div>
 
-        <!-- Círculos orbitais de projetos -->
-        <div class="circular-nodes-container" id="circularNodesContainer"></div>
+          <!-- Círculos orbitais de projetos -->
+          <div class="circular-nodes-container" id="circularNodesContainer"></div>
 
-        <!-- Núcleo Central Ativo -->
-        <div class="circular-core" id="circularCore" title="Clique para entrar neste projeto">
-          <div class="core-icon" id="coreIcon">📁</div>
-          <div class="core-title" id="coreTitle">Projeto</div>
-          <div class="core-meta" id="coreMeta">0 Tarefas</div>
-          <div class="core-indicator">
-            <span>●</span>
-            <span>Entrar no Quadro</span>
+          <!-- Núcleo Central Ativo -->
+          <div class="circular-core" id="circularCore" title="Clique para entrar neste projeto">
+            <div class="core-icon" id="coreIcon">📁</div>
+            <div class="core-title" id="coreTitle">Projeto</div>
+            <div class="core-meta" id="coreMeta">0 Tarefas</div>
+            <div class="core-indicator">
+              <span>●</span>
+              <span>Entrar no Quadro</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Painel Interativo de Módulos & Diretórios Locais -->
+        <div class="landing-modules-inspector" id="modulesInspector" data-place="telemetria-modulos">
+          <div class="inspector-header">
+            <div class="inspector-title-row">
+              <h3><span class="site-led led-cyan"></span> Telemetria e Módulos Locais</h3>
+              <span class="version-tag" id="inspectorActiveTag">Módulo Ativo</span>
+            </div>
+            <p class="inspector-hint">Clique em um LED ou aba para atualizar a telemetria aqui, sem sair do lugar.</p>
+            <div class="inspector-tabs" id="inspectorTabs">
+              <button class="mod-tab active" data-mod="servidor" data-directory="modulos/servidor/index.html" title="Atualizar a telemetria de Servidor (Ctrl+Clique abre a pasta local)"><span class="site-led led-green"></span> Servidor</button>
+              <button class="mod-tab" data-mod="nuvem" data-directory="modulos/nuvem/index.html" title="Atualizar a telemetria de Nuvem (Ctrl+Clique abre a pasta local)"><span class="site-led led-cyan"></span> Nuvem</button>
+              <button class="mod-tab" data-mod="motion" data-directory="modulos/motion/index.html" title="Atualizar a telemetria de Motion (Ctrl+Clique abre a pasta local)"><span class="site-led led-purple"></span> Motion</button>
+              <button class="mod-tab" data-mod="fila" data-directory="modulos/fila/index.html" title="Atualizar a telemetria de Fila (Ctrl+Clique abre a pasta local)"><span class="site-led led-amber"></span> Fila</button>
+              <button class="mod-tab" data-mod="urgente" data-directory="modulos/urgente/index.html" title="Atualizar a telemetria de Urgente (Ctrl+Clique abre a pasta local)"><span class="site-led led-red"></span> Urgente</button>
+              <button class="mod-tab" data-mod="reativo" data-directory="modulos/reativo/index.html" title="Atualizar a telemetria de Reativo (Ctrl+Clique abre a pasta local)"><span class="site-led led-pink"></span> Reativo</button>
+            </div>
+          </div>
+
+          <div class="inspector-body" id="inspectorBody">
+            <!-- Populated dynamically by landing.js -->
           </div>
         </div>
       </div>

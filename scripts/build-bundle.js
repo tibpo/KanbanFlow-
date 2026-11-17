@@ -2,7 +2,7 @@ const fs = require('fs');
 const path = require('path');
 
 const jsDir = path.join(__dirname, '..', 'src', 'js');
-const files = ['config.js', 'storage.js', 'sync.js', 'state.js', 'dragDrop.js', 'modal.js', 'ui.js', 'landing.js', 'cursor.js', 'app.js'];
+const files = ['config.js', 'storage.js', 'sync.js', 'state.js', 'dragDrop.js', 'modal.js', 'ui.js', 'universe.js', 'landing.js', 'cursor.js', 'app.js'];
 
 let combined = '(function() {\n  "use strict";\n\n';
 

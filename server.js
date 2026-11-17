@@ -2,11 +2,23 @@ const http = require('http');
 const fs = require('fs');
 const path = require('path');
 const os = require('os');
+const { execFile } = require('child_process');
 
 const PORT = process.env.PORT || 3000;
 const PUBLIC_DIR = __dirname;
 const DATA_DIR = path.join(PUBLIC_DIR, 'data');
 const DATA_FILE = path.join(DATA_DIR, 'kanban.json');
+
+// Pastas locais que a landing pode abrir no gerenciador de arquivos do sistema.
+// Lista branca fixa: nada fora destes diretórios pode ser aberto pela API.
+const MODULE_DIRECTORIES = {
+  servidor: 'modulos/servidor',
+  nuvem: 'modulos/nuvem',
+  motion: 'modulos/motion',
+  fila: 'modulos/fila',
+  urgente: 'modulos/urgente',
+  reativo: 'modulos/reativo'
+};
 
 // Ensure data folder and initial json file exist
 if (!fs.existsSync(DATA_DIR)) {
@@ -190,6 +202,85 @@ const server = http.createServer((req, res) => {
     return;
   }
 
+  // ================= API: Signal Pulse (ping do canal em tempo real) =================
+  if (pathname === '/api/ping' && req.method === 'GET') {
+    res.writeHead(200, {
+      'Content-Type': 'application/json; charset=utf-8',
+      'Cache-Control': 'no-store, no-cache, must-revalidate'
+    });
+    return res.end(JSON.stringify({
+      success: true,
+      timestamp: Date.now(),
+      port: Number(PORT),
+      clients: sseClients.size,
+      storage: DATA_FILE
+    }));
+  }
+
+  // ================= API: Abrir a pasta de um módulo no Explorer/Finder =================
+  if (pathname === '/api/open-directory' && req.method === 'POST') {
+    const remote = (req.socket.remoteAddress || '').replace('::ffff:', '');
+    const isLocalMachine = remote === '127.0.0.1' || remote === '::1' || remote === 'localhost';
+
+    if (!isLocalMachine) {
+      res.writeHead(403, { 'Content-Type': 'application/json; charset=utf-8' });
+      return res.end(JSON.stringify({
+        success: false,
+        error: 'Por segurança, abrir pastas no sistema só é permitido na própria máquina que roda o servidor.'
+      }));
+    }
+
+    let body = '';
+    req.on('data', chunk => body += chunk);
+    req.on('end', () => {
+      try {
+        const payload = JSON.parse(body || '{}');
+        const relative = MODULE_DIRECTORIES[payload.module];
+
+        if (!relative) {
+          res.writeHead(400, { 'Content-Type': 'application/json; charset=utf-8' });
+          return res.end(JSON.stringify({ success: false, error: 'Módulo desconhecido.' }));
+        }
+
+        const targetDir = path.resolve(PUBLIC_DIR, relative);
+        if (!targetDir.startsWith(PUBLIC_DIR) || !fs.existsSync(targetDir)) {
+          res.writeHead(404, { 'Content-Type': 'application/json; charset=utf-8' });
+          return res.end(JSON.stringify({ success: false, error: 'Pasta do módulo não encontrada.', path: targetDir }));
+        }
+
+        const opener = process.platform === 'win32'
+          ? 'explorer.exe'
+          : (process.platform === 'darwin' ? 'open' : 'xdg-open');
+
+        execFile(opener, [targetDir], (err) => {
+          // No Windows o explorer.exe pode retornar código 1 mesmo abrindo a pasta;
+          // só tratamos como falha quando o executável não existe.
+          if (err && err.code === 'ENOENT') {
+            res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+            return res.end(JSON.stringify({
+              success: false,
+              error: `Nenhum gerenciador de arquivos disponível (${opener}).`,
+              path: targetDir
+            }));
+          }
+
+          res.writeHead(200, { 'Content-Type': 'application/json; charset=utf-8' });
+          res.end(JSON.stringify({
+            success: true,
+            module: payload.module,
+            relative,
+            path: targetDir,
+            opener
+          }));
+        });
+      } catch (err) {
+        res.writeHead(500, { 'Content-Type': 'application/json; charset=utf-8' });
+        res.end(JSON.stringify({ success: false, error: err.message }));
+      }
+    });
+    return;
+  }
+
   // ================= Static File Serving =================
   let safePath = path.normalize(decodeURI(pathname));
   if (safePath === '/' || safePath === '\\') {
@@ -205,12 +296,18 @@ const server = http.createServer((req, res) => {
   }
 
   fs.stat(filePath, (err, stats) => {
-    if (err || !stats.isFile()) {
+    if (err) {
       res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
       return res.end('404 Não Encontrado');
     }
 
-    const ext = path.extname(filePath).toLowerCase();
+    const resolvedFile = stats.isDirectory() ? path.join(filePath, 'index.html') : filePath;
+    if (stats.isDirectory() && !resolvedFile.startsWith(PUBLIC_DIR)) {
+      res.writeHead(403, { 'Content-Type': 'text/plain; charset=utf-8' });
+      return res.end('403 Proibido');
+    }
+
+    const ext = path.extname(resolvedFile).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
     res.writeHead(200, {
@@ -218,7 +315,13 @@ const server = http.createServer((req, res) => {
       'Cache-Control': 'no-cache'
     });
 
-    const stream = fs.createReadStream(filePath);
+    const stream = fs.createReadStream(resolvedFile);
+    stream.on('error', () => {
+      if (!res.headersSent) {
+        res.writeHead(404, { 'Content-Type': 'text/plain; charset=utf-8' });
+      }
+      res.end('404 Não Encontrado');
+    });
     stream.pipe(res);
   });
 });
